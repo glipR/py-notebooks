@@ -1,0 +1,40 @@
+.resizeBar {
+  flex-shrink: 0;
+  background-color: #5a5a5a;
+  transition: background-color 0.15s 0.15s ease-in-out;
+}
+
+.resizeHorizontal {
+  width: 5px;
+  cursor: col-resize;
+}
+.resizeVertical {
+  height: 5px;
+  cursor: row-resize;
+}
+
+.flexContainer {
+  display: "flex"
+}
+
+.shrink {
+  flex-shrink: 0;
+}
+
+.grow {
+  flex-grow: 1;
+}
+
+.contentContainer {
+  padding: 5px 5px 5px 10px;
+  overflow-y: auto;
+}
+
+.windowContainer {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  background-color: #2D3032;
+  color: white;
+  overflow: hidden;
+}

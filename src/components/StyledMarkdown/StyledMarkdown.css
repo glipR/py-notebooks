@@ -1,0 +1,24 @@
+.note {
+  padding: 3px 8px;
+  border-radius: 3px;
+  p, h1, h2, h3 {
+    margin-block-start: 0em;
+  }
+
+  &.info {
+    background-color: #33338880;
+  }
+
+  &.warning {
+    background-color: #88623380;
+  }
+
+  &.success {
+    background-color: #28a42680;
+  }
+}
+
+p > code {
+  color: #ffa500;
+  background-color: #00000030;
+}
