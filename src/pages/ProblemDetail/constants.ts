@@ -1,1 +1,2 @@
 export const CONTENT_HORIZONTAL_PADDING = 15;
+export const CODE_VERTICAL_PADDING = 32;

@@ -48,7 +48,8 @@ const ProblemDetail: React.FC<Props> = (props) => {
   const {
     // isDragging: isContentDragging,
     position: contentW,
-    separatorProps: contentDragBarProps
+    separatorProps: contentDragBarProps,
+    setPosition: contentDragBarSet,
   } = useResizable({
     axis: "x",
     initial: 450,
@@ -57,7 +58,8 @@ const ProblemDetail: React.FC<Props> = (props) => {
   const {
     // isDragging: isCodeDragging,
     position: codeH,
-    separatorProps: codeDragBarProps
+    separatorProps: codeDragBarProps,
+    setPosition: codeDragBarSet,
   } = useResizable({
     axis: "y",
     initial: 600,
@@ -68,13 +70,55 @@ const ProblemDetail: React.FC<Props> = (props) => {
     <div
       className={styles.windowContainer}
     >
-      <div className={cn('content', styles.shrink, styles.contentContainer)} style={{width: contentW - constants.CONTENT_HORIZONTAL_PADDING}}>
-        <StyledMarkdown content={markdown} />
+      <div className={styles.top_bar}>
+        <div className={styles.top_bar_item}>
+          <span className={styles.top_bar_text}>File</span>
+          <button className={styles.top_bar_subitem}>New File</button>
+          <button className={styles.top_bar_subitem}>Rename File</button>
+        </div>
+        <button className={styles.top_bar_item}>Edit</button>
+        <button className={styles.top_bar_item}>Window</button>
+        <div className={styles.top_bar_spacer}></div>
+        <button className={cn(styles.top_bar_item, styles.top_bar_small)}>{'|>'}</button>
+        <button className={cn(styles.top_bar_item, styles.top_bar_small)}>{'||'}</button>
       </div>
-      <div className={cn(styles.resizeBar, styles.resizeHorizontal)} {...contentDragBarProps}></div>
-      <div className={cn('code_game', styles.grow, styles.flexContainer)} style={{flexDirection: 'column'}}>
-        <div className={cn('code', styles.shrink)} style={{height: codeH}}></div>
-        <div className={cn(styles.resizeBar, styles.resizeVertical)} {...codeDragBarProps}></div>
+      <div className={cn('content', styles.shrink, styles.contentContainer)} style={{width: contentW - constants.CONTENT_HORIZONTAL_PADDING}}>
+        {contentW - constants.CONTENT_HORIZONTAL_PADDING > 10 && <StyledMarkdown content={markdown} />}
+      </div>
+      <div className={cn(styles.resizeBar, styles.resizeHorizontal)} {...contentDragBarProps}>
+        <button
+          className={cn(styles.horizontal_snapper, styles.left_snapper)}
+          onClick={()=>contentDragBarSet(16)}
+        />
+        <button
+          className={cn(styles.horizontal_snapper, styles.right_snapper)}
+          onClick={()=>contentDragBarSet(window.document.body.clientWidth - 10)} // TODO
+        />
+      </div>
+      <div className={cn(styles.code_game, styles.grow, styles.flexContainer)} style={{flexDirection: 'column'}}>
+        {
+          codeH - constants.CODE_VERTICAL_PADDING > 10 &&
+          <div
+            className={cn('code', styles.shrink)}
+            style={{height: codeH - constants.CODE_VERTICAL_PADDING}}
+          >
+          </div>
+        }
+        <div className={cn(styles.resizeBar, styles.resizeVertical)} {...codeDragBarProps}>
+          {
+            window.document.body.clientWidth - 10 - contentW > 32 &&
+            <>
+            <button
+              className={cn(styles.vertical_snapper, styles.top_snapper)}
+              onClick={()=>codeDragBarSet(35)}
+            />
+            <button
+              className={cn(styles.vertical_snapper, styles.bottom_snapper)}
+              onClick={()=>codeDragBarSet(window.document.body.clientHeight - 10)} // TODO
+            />
+            </>
+          }
+        </div>
         <div className={cn('game', styles.grow)}></div>
       </div>
     </div>
