@@ -35,4 +35,6 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 * [ ] Add some helper methods to connect game window to python script
 * [x] Add floating actions bar above the code and content boxes
 * [x] Add buttons to the side of the dragbars to snap to the end
-* [ ] Add space for debugger
+* [x] Add space for debugger
+* [ ] Add animation to menu items, box widths and separators
+* [ ] Add styling for debugger

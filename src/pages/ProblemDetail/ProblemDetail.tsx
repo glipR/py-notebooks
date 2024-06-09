@@ -1,7 +1,11 @@
 import React from 'react';
 
 import { useResizable } from "react-resizable-layout";
-
+import {indentWithTab} from "@codemirror/commands"
+import CodeMirror from '@uiw/react-codemirror'
+import { keymap } from '@uiw/react-codemirror';
+import { python } from '@codemirror/lang-python'
+import { okaidia } from '@uiw/codemirror-theme-okaidia'
 import StyledMarkdown from '../../components/StyledMarkdown/StyledMarkdown';
 
 import { cn } from '../../utils/cn';
@@ -12,6 +16,13 @@ import * as constants from './constants';
 type Props = {
   // Define your props here
 };
+
+const extensions = [python(), keymap.of([indentWithTab])];
+const code = `\
+print("Hello World")
+
+a = 2 + 3\
+`
 
 const markdown = `\
 # Welcome to the Codebook!
@@ -46,7 +57,6 @@ print("Hello World!")
 
 const ProblemDetail: React.FC<Props> = (props) => {
   const {
-    // isDragging: isContentDragging,
     position: contentW,
     separatorProps: contentDragBarProps,
     setPosition: contentDragBarSet,
@@ -56,7 +66,6 @@ const ProblemDetail: React.FC<Props> = (props) => {
     min: 0
   });
   const {
-    // isDragging: isCodeDragging,
     position: codeH,
     separatorProps: codeDragBarProps,
     setPosition: codeDragBarSet,
@@ -65,6 +74,18 @@ const ProblemDetail: React.FC<Props> = (props) => {
     initial: 600,
     min: 0
   });
+  const {
+    position: debuggerH,
+    separatorProps: debuggerDragBarProps,
+    setPosition: debuggerDragBarSet
+  } = useResizable({
+    axis: "y",
+    initial: 5,
+    min: 0,
+    reverse: true,
+  })
+
+  const [codeValue, ] = React.useState(code);
 
   return (
     <div
@@ -82,8 +103,75 @@ const ProblemDetail: React.FC<Props> = (props) => {
         <button className={cn(styles.top_bar_item, styles.top_bar_small)}>{'|>'}</button>
         <button className={cn(styles.top_bar_item, styles.top_bar_small)}>{'||'}</button>
       </div>
-      <div className={cn('content', styles.shrink, styles.contentContainer)} style={{width: contentW - constants.CONTENT_HORIZONTAL_PADDING}}>
-        {contentW - constants.CONTENT_HORIZONTAL_PADDING > 10 && <StyledMarkdown content={markdown} />}
+      <div className={cn(styles.shrink, styles.contentContainer)} style={{width: contentW - constants.CONTENT_HORIZONTAL_PADDING}}>
+      {contentW - constants.CONTENT_HORIZONTAL_PADDING > 10 &&
+        <>
+        <div className={cn(styles.content, styles.grow)}>
+          <StyledMarkdown content={markdown} />
+        </div>
+        <div className={cn(styles.resizeBar, styles.resizeVertical)} {...debuggerDragBarProps}>
+          {
+            contentW - constants.CONTENT_HORIZONTAL_PADDING > 10 &&
+            <>
+            <button
+              className={cn(styles.vertical_snapper, styles.top_snapper)}
+              onClick={()=>debuggerDragBarSet(window.document.body.clientHeight - constants.CODE_VERTICAL_PADDING - 10)}
+            />
+            <button
+              className={cn(styles.vertical_snapper, styles.bottom_snapper)}
+              onClick={()=>debuggerDragBarSet(0)}
+            />
+            </>
+          }
+        </div>
+        { debuggerH - constants.DEBUGGER_VERTICAL_PADDING > 10 &&
+        <div className={cn(styles.shrink, styles.debuggerContainer)} style={{height: debuggerH - constants.DEBUGGER_VERTICAL_PADDING, width: "100%"}}>
+          {
+            // WINDOW:
+            <>
+            <div className={styles.debuggerSection}>
+              <div className={styles.debuggerSectionTitle}>Variables</div>
+              <div className={styles.debuggerVariablesContainer}>
+                <div className={styles.debuggerVariable}>
+                  <div className={styles.debuggerVariableKey}>x</div>
+                  <div className={styles.debuggerVariableValue}>3</div>
+                </div>
+                <div className={styles.debuggerVariable}>
+                  <div className={styles.debuggerVariableKey}>y</div>
+                  <div className={styles.debuggerVariableValue}>2</div>
+                </div>
+                <div className={styles.debuggerVariable}>
+                  <div className={styles.debuggerVariableKey}>z</div>
+                  <div className={styles.debuggerVariableValue}><code>Hello World</code></div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.debuggerSection}>
+              <div className={styles.debuggerSectionTitle}>Watched Values</div>
+              <div className={styles.debuggerVariablesContainer}>
+                <div className={styles.debuggerVariable}>
+                  <div className={styles.debuggerVariableKeyInput}><input value='x'></input></div>
+                  <div className={styles.debuggerVariableValue}>3</div>
+                </div>
+              </div>
+            </div>
+            <div className={styles.debuggerSection}>
+              <div className={styles.debuggerSectionTitle}>Call Stack</div>
+              <div className={styles.debuggerCallStackContainer}>
+                <div className={styles.debuggerCallStackItem}>
+                  <div className={styles.debuggerCallStackItemFunctionName}>main</div>
+                </div>
+              </div>
+            </div>
+            </>
+
+            // MISC:
+            // Highlight Breakpoints
+          }
+        </div>
+        }
+        </>
+      }
       </div>
       <div className={cn(styles.resizeBar, styles.resizeHorizontal)} {...contentDragBarProps}>
         <button
@@ -102,6 +190,12 @@ const ProblemDetail: React.FC<Props> = (props) => {
             className={cn('code', styles.shrink)}
             style={{height: codeH - constants.CODE_VERTICAL_PADDING}}
           >
+            <CodeMirror
+              height={`${codeH - constants.CODE_VERTICAL_PADDING}px`}
+              value={codeValue}
+              theme={okaidia}
+              extensions={extensions}
+            />
           </div>
         }
         <div className={cn(styles.resizeBar, styles.resizeVertical)} {...codeDragBarProps}>

@@ -8,14 +8,16 @@
 .resizeHorizontal {
   width: 5px;
   cursor: col-resize;
+  height: 100vh;
 }
 .resizeVertical {
   height: 5px;
+  width: 100%;
   cursor: row-resize;
 }
 
 .flexContainer {
-  display: "flex"
+  display: flex
 }
 
 .shrink {
@@ -28,6 +30,11 @@
 
 .contentContainer {
   padding: 15px 5px 5px 10px;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
   overflow-y: auto;
 }
 
@@ -127,6 +134,8 @@
   margin: 0px;
   border: none;
   background-color: #5a5a5a;
+  cursor: col-resize;
+  z-index: 3;
 
   &.left_snapper {
     left: -12px;
@@ -146,6 +155,8 @@
   margin: 0px;
   border: none;
   background-color: #5a5a5a;
+  cursor: row-resize;
+  z-index: 3;
 
   &.top_snapper {
     top: -12px;
@@ -155,4 +166,35 @@
     bottom: -12px;
     content: "\\/";
   }
+}
+
+.debuggerContainer {
+  padding-top: 10px;
+}
+
+.debuggerSection {
+  width: 100%;
+}
+
+.debuggerSectionTitle {
+  width: 100%;
+  background-color: #505050;
+  text-align: center;
+}
+
+.debuggerVariable {
+  display: flex;
+  border-top: 1px solid #222222;
+  justify-content: space-between;
+  padding: 2px 5px;
+}
+
+.debuggerVariableKey, .debuggerVariableKeyInput {
+  flex-shrink: 0;
+  color: #ffa500;
+  background-color: #00000030;
+}
+
+.debuggerVariableValue {
+  flex-shrink: 0;
 }
