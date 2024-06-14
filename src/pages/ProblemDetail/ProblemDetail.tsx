@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 
 import { useResizable } from "react-resizable-layout";
 import {indentWithTab} from "@codemirror/commands"
@@ -7,84 +7,24 @@ import { keymap } from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python'
 import { okaidia } from '@uiw/codemirror-theme-okaidia'
 import { PythonProvider, usePython } from 'react-py'
-import { Stage, Sprite } from '@pixi/react';
-import * as PIXI from 'pixi.js'
 import StyledMarkdown from '../../components/StyledMarkdown/StyledMarkdown';
 
 import { cn } from '../../utils/cn';
 import styles from './ProblemDetail.module.css';
 
 import * as constants from './constants';
+import GameWindow from '../../components/GameWindow/GameWindow';
 
 type Props = {
-  // Define your props here
+  markdown_text: string;
+  template_code: string;
+  children: ReactElement;
+  game_ref: React.RefObject<GameWindow>;
 };
 
 const extensions = [python(), keymap.of([indentWithTab])];
-const code = `\
-colours = [
-  0xFF0000,
-  0xFFFF00,
-  0x00FF00,
-  0x00FFFF,
-  0x0000FF,
-  0xFF00FF
-]
 
-import time
-
-for t in range(3):
-  for a in range(30):
-    prev = (a-3) % 30
-    px, py = prev % 10, prev // 10
-    x, y = a % 10, a // 10
-    send_cube(px, py, 0x000000)
-    send_cube(x, y, colours[a % len(colours)])
-    time.sleep(0.05)
-  time.sleep(1)
-`
-
-const markdown = `\
-# Welcome to the Codebook!
-
-This is all about doing the fun parts of coding, without any of the fluff.
-
-From here you can write code in the right sidebar, and see your results directly in the game window below!
-
-:::note{.info}
-### Window Controls
-
-Drag the bars separating this text, the code and the game window to the size you want.
-
-You can also press the arrow buttons on the line to minimise / maximise certain windows.
-:::
-
-Your first task is to print your name on the screen.
-
-Names and other bits of text are represented as strings in Python. So that Python doesn't confuse your name for code, strings are surrounded by quotation marks (\`"\` or \`'\`).
-
-Your friend for these first few problems is the \`print\` function. You can place any string inside the brackets right of the \`print\` function to display it on the big screen.
-
-:::note{.warning}
-### Resetting
-If at any point you want to revert the code to the original state, you can press the reset button in the top right corner of the code window.
-:::
-
-~~~python
-print("Hello World!")
-~~~
-`;
-
-const defaultGrid: number[][] = [];
-for (let i = 0; i < 3; i++) {
-  const row = [];
-  for (let j = 0; j < 10; j++) {
-    row.push(0x000000);
-  }
-  defaultGrid.push(row);
-}
-
-const ProblemDetail: React.FC<Props> = (props) => {
+const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children, game_ref }) => {
   const {
     position: contentW,
     separatorProps: contentDragBarProps,
@@ -114,10 +54,9 @@ const ProblemDetail: React.FC<Props> = (props) => {
     reverse: true,
   })
 
-  const [codeValue, setCode] = React.useState(code);
+  const [codeValue, setCode] = React.useState(template_code);
   const [stdoutValue, setStdout] = React.useState('');
   const [lastAnalysed, setAnalysed] = React.useState(-1);
-  const [squaresVal, setSquares] = React.useState(defaultGrid);
   const {runPython, stdout, isLoading, isRunning} = usePython({
     packages: {
       micropip: ['pyodide-http']
@@ -126,6 +65,7 @@ const ProblemDetail: React.FC<Props> = (props) => {
 
   const gameHeight = window.innerHeight - codeH - 10;
   const gameWidth = window.innerWidth - contentW - 10;
+  game_ref.current?.setDimensions(gameWidth, gameHeight);
 
   React.useEffect(() => {
     if (stdoutValue !== stdout) {
@@ -142,17 +82,13 @@ const ProblemDetail: React.FC<Props> = (props) => {
           obj = JSON.parse(line);
         } catch (e) {}
         if (obj !== undefined) {
-          if (obj.type === 'cube') {
-            const newGrid = [...squaresVal];
-            newGrid[obj.y][obj.x] = obj.color;
-            setSquares(newGrid);
-          }
+          game_ref.current?.ingestMessage(obj)
         }
       }
       setAnalysed(curAnalysed);
       setStdout(stdout);
     }
-  }, [stdout, stdoutValue, squaresVal, lastAnalysed]);
+  }, [stdout, stdoutValue, lastAnalysed, game_ref]);
 
   // async method for onclick
   const playPressed = async () => {
@@ -180,7 +116,7 @@ const ProblemDetail: React.FC<Props> = (props) => {
       {contentW - constants.CONTENT_HORIZONTAL_PADDING > 10 &&
         <>
         <div className={cn(styles.content, styles.grow)}>
-          <StyledMarkdown content={markdown} />
+          <StyledMarkdown content={markdown_text} />
         </div>
         <div className={cn(styles.resizeBar, styles.resizeVertical)} {...debuggerDragBarProps}>
           {
@@ -288,18 +224,7 @@ const ProblemDetail: React.FC<Props> = (props) => {
           }
         </div>
         <div className={cn('game', styles.grow)}>
-        <Stage options={{ background: 0x2D3032 }} height={gameHeight} width={gameWidth}>
-          {squaresVal.map((row, y) => row.map((color, x) => <Sprite
-            key={`${x}-${y}`}
-            texture={PIXI.Texture.WHITE}
-            x={gameWidth/20.0 + x * gameWidth/10.0}
-            y={gameHeight/6.0 + y * gameHeight/3.0}
-            tint={color}
-            anchor={{ x: 0.5, y: 0.5 }}
-            width={gameWidth/10.0}
-            height={gameHeight/3.0}
-          />))}
-        </Stage>
+        {children}
         </div>
       </div>
     </div>
