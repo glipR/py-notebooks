@@ -104,6 +104,10 @@
     }
   }
 
+  &:disabled {
+    color: #444444;
+  }
+
   .top_bar_subitem {
     padding: 2px 5px;
     position: absolute;

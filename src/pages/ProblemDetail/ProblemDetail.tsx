@@ -6,6 +6,9 @@ import CodeMirror from '@uiw/react-codemirror'
 import { keymap } from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python'
 import { okaidia } from '@uiw/codemirror-theme-okaidia'
+import { PythonProvider, usePython } from 'react-py'
+import { Stage, Sprite } from '@pixi/react';
+import * as PIXI from 'pixi.js'
 import StyledMarkdown from '../../components/StyledMarkdown/StyledMarkdown';
 
 import { cn } from '../../utils/cn';
@@ -19,9 +22,26 @@ type Props = {
 
 const extensions = [python(), keymap.of([indentWithTab])];
 const code = `\
-print("Hello World")
+colours = [
+  0xFF0000,
+  0xFFFF00,
+  0x00FF00,
+  0x00FFFF,
+  0x0000FF,
+  0xFF00FF
+]
 
-a = 2 + 3\
+import time
+
+for t in range(3):
+  for a in range(30):
+    prev = (a-3) % 30
+    px, py = prev % 10, prev // 10
+    x, y = a % 10, a // 10
+    send_cube(px, py, 0x000000)
+    send_cube(x, y, colours[a % len(colours)])
+    time.sleep(0.05)
+  time.sleep(1)
 `
 
 const markdown = `\
@@ -55,6 +75,15 @@ print("Hello World!")
 ~~~
 `;
 
+const defaultGrid: number[][] = [];
+for (let i = 0; i < 3; i++) {
+  const row = [];
+  for (let j = 0; j < 10; j++) {
+    row.push(0x000000);
+  }
+  defaultGrid.push(row);
+}
+
 const ProblemDetail: React.FC<Props> = (props) => {
   const {
     position: contentW,
@@ -85,9 +114,53 @@ const ProblemDetail: React.FC<Props> = (props) => {
     reverse: true,
   })
 
-  const [codeValue, ] = React.useState(code);
+  const [codeValue, setCode] = React.useState(code);
+  const [stdoutValue, setStdout] = React.useState('');
+  const [lastAnalysed, setAnalysed] = React.useState(-1);
+  const [squaresVal, setSquares] = React.useState(defaultGrid);
+  const {runPython, stdout, isLoading, isRunning} = usePython({
+    packages: {
+      micropip: ['pyodide-http']
+    }
+  });
+
+  const gameHeight = window.innerHeight - codeH - 10;
+  const gameWidth = window.innerWidth - contentW - 10;
+
+  React.useEffect(() => {
+    if (stdoutValue !== stdout) {
+      let curAnalysed = lastAnalysed;
+      if (!stdout.startsWith(stdoutValue)) {
+        curAnalysed = -1;
+      }
+      const lines = stdout.split('\n');
+      while (curAnalysed < lines.length - 1) {
+        const line = lines[curAnalysed + 1];
+        curAnalysed = curAnalysed + 1;
+        let obj: any = undefined;
+        try {
+          obj = JSON.parse(line);
+        } catch (e) {}
+        if (obj !== undefined) {
+          if (obj.type === 'cube') {
+            const newGrid = [...squaresVal];
+            newGrid[obj.y][obj.x] = obj.color;
+            setSquares(newGrid);
+          }
+        }
+      }
+      setAnalysed(curAnalysed);
+      setStdout(stdout);
+    }
+  }, [stdout, stdoutValue, squaresVal, lastAnalysed]);
+
+  // async method for onclick
+  const playPressed = async () => {
+    await runPython(constants.PYTHON_PREAMBLE + '\n' + codeValue);
+  };
 
   return (
+    <PythonProvider>
     <div
       className={styles.windowContainer}
     >
@@ -100,8 +173,8 @@ const ProblemDetail: React.FC<Props> = (props) => {
         <button className={styles.top_bar_item}>Edit</button>
         <button className={styles.top_bar_item}>Window</button>
         <div className={styles.top_bar_spacer}></div>
-        <button className={cn(styles.top_bar_item, styles.top_bar_small)}>{'|>'}</button>
-        <button className={cn(styles.top_bar_item, styles.top_bar_small)}>{'||'}</button>
+        <button disabled={isRunning || isLoading} onClick={playPressed} className={cn(styles.top_bar_item, styles.top_bar_small)}>{'|>'}</button>
+        <button disabled={!isRunning} className={cn(styles.top_bar_item, styles.top_bar_small)}>{'||'}</button>
       </div>
       <div className={cn(styles.shrink, styles.contentContainer)} style={{width: contentW - constants.CONTENT_HORIZONTAL_PADDING}}>
       {contentW - constants.CONTENT_HORIZONTAL_PADDING > 10 &&
@@ -195,12 +268,13 @@ const ProblemDetail: React.FC<Props> = (props) => {
               value={codeValue}
               theme={okaidia}
               extensions={extensions}
+              onChange={(value) => setCode(value)}
             />
           </div>
         }
         <div className={cn(styles.resizeBar, styles.resizeVertical)} {...codeDragBarProps}>
           {
-            window.document.body.clientWidth - 10 - contentW > 32 &&
+            window.innerWidth - 10 - contentW > 32 &&
             <>
             <button
               className={cn(styles.vertical_snapper, styles.top_snapper)}
@@ -208,14 +282,28 @@ const ProblemDetail: React.FC<Props> = (props) => {
             />
             <button
               className={cn(styles.vertical_snapper, styles.bottom_snapper)}
-              onClick={()=>codeDragBarSet(window.document.body.clientHeight - 10)} // TODO
+              onClick={()=>codeDragBarSet(window.innerHeight - 10)}
             />
             </>
           }
         </div>
-        <div className={cn('game', styles.grow)}></div>
+        <div className={cn('game', styles.grow)}>
+        <Stage options={{ background: 0x2D3032 }} height={gameHeight} width={gameWidth}>
+          {squaresVal.map((row, y) => row.map((color, x) => <Sprite
+            key={`${x}-${y}`}
+            texture={PIXI.Texture.WHITE}
+            x={gameWidth/20.0 + x * gameWidth/10.0}
+            y={gameHeight/6.0 + y * gameHeight/3.0}
+            tint={color}
+            anchor={{ x: 0.5, y: 0.5 }}
+            width={gameWidth/10.0}
+            height={gameHeight/3.0}
+          />))}
+        </Stage>
+        </div>
       </div>
     </div>
+    </PythonProvider>
   );
 };
 
