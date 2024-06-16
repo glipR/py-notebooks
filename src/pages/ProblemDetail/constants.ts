@@ -10,9 +10,4 @@ def fake_print(*args, sep=' ', end='\\n'):
     msg_obj = { "type": "print", "content": content }
     old_print(json.dumps(msg_obj))
 print = fake_print
-
-def send_cube(x, y, color):
-    msg_obj = { "type": "cube", "x": x, "y": y, "color": color }
-    old_print(json.dumps(msg_obj))
-
 `

@@ -19,3 +19,10 @@ for t in range(4):
     time.sleep(0.05)
   time.sleep(1)
 `
+
+export const TURTLE_CODE = `\
+forward(20)
+right(90)
+forward(20)
+shift_left(40)
+`

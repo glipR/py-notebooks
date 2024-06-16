@@ -6,6 +6,12 @@ import * as PIXI from 'pixi.js'
 
 import React from 'react';
 
+const code = `
+def send_cube(x, y, color):
+    msg_obj = { "type": "cube", "x": x, "y": y, "color": color }
+    old_print(json.dumps(msg_obj))
+`
+
 const toHex = (color: string) =>
   /^#/.test(color)
     ? utils.string2hex(color)
@@ -60,6 +66,10 @@ export default class GridSquares extends React.Component<GridSquareProps, GridSq
 
   setDimensions(width: number, height: number):void {
     this.setState({ width, height });
+  }
+
+  getPythonPreamble(): string {
+    return code;
   }
 
   render() {

@@ -92,7 +92,7 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
 
   // async method for onclick
   const playPressed = async () => {
-    await runPython(constants.PYTHON_PREAMBLE + '\n' + codeValue);
+    await runPython(constants.PYTHON_PREAMBLE + '\n' + game_ref.current?.getPythonPreamble() + '\n' + codeValue);
   };
 
   return (
