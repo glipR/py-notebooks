@@ -5,9 +5,14 @@ import * as utils from '@pixi/utils'
 import * as PIXI from 'pixi.js'
 
 import React from 'react';
+import { TreeStructure, makeCode } from '../../components/MultiFileEditor/MultiFileEditor';
 
 const code = `
-def send_cube(x, y, color):
+import json
+from utils.mocking import make_func
+
+@make_func
+def send_cube(old_print, x, y, color):
     msg_obj = { "type": "cube", "x": x, "y": y, "color": color }
     old_print(json.dumps(msg_obj))
 `
@@ -68,8 +73,10 @@ export default class GridSquares extends React.Component<GridSquareProps, GridSq
     this.setState({ width, height });
   }
 
-  getPythonPreamble(): string {
-    return code;
+  getPythonPreamble(): TreeStructure {
+    return {
+      "cube.py": makeCode(code)
+    };
   }
 
   render() {

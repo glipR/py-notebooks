@@ -29,7 +29,7 @@ const router = createBrowserRouter([
   {
     path: "/noteboooks/1",
     element: (
-    <ProblemDetail markdown_text={markdowns.WELCOME_MARKDOWN} template_code={templates.CUBES_CODE} game_ref={ref1}>
+    <ProblemDetail markdown_text={markdowns.WELCOME_MARKDOWN} template_code={templates.CUBES_CODE} game_ref={ref1} startScript='code.py'>
       <GridSquares ref={ref1} gridHeight={3} gridWidth={10} />
     </ProblemDetail>
     )
@@ -37,7 +37,7 @@ const router = createBrowserRouter([
   {
     path: "/noteboooks/2",
     element: (
-    <ProblemDetail markdown_text={markdowns.TURTLE_MARKDOWN} template_code={templates.TURTLE_CODE} game_ref={ref2}>
+    <ProblemDetail markdown_text={markdowns.TURTLE_MARKDOWN} template_code={templates.TURTLE_CODE} game_ref={ref2} startScript='code.py'>
       <Turtles ref={ref2} areaHeight={100} areaWidth={100} />
     </ProblemDetail>
     )

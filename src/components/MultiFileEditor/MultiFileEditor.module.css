@@ -1,0 +1,54 @@
+.editorView {
+  display: flex;
+}
+
+.folderView {
+  min-width: 130px;
+  flex-shrink: 0;
+}
+
+.codeView {
+  flex-grow: 1;
+}
+
+.treeRender {
+  padding-left: 4px;
+}
+
+.folderKey:after{
+  content: "";
+  margin: 0 0.5em;
+  display: inline-block;
+  border: 7px solid transparent;
+  border-top: 8px solid gray;
+  border-bottom: 0 none;
+  transition: 0.3s;
+}
+
+.folderKey.folded:after{
+  transform: rotate(180deg) translateY(2.5px);
+}
+
+.fileKey.active {
+  background-color: #464646;
+}
+
+.contextMenu {
+  position: absolute;
+  display: none;
+  background-color: #f9f9f9;
+  border: 1px solid #c0c0c0;
+  z-index: 100;
+  color: black;
+
+  ul {
+    margin: 0;
+    list-style: none;
+    padding: 3px 5px;
+  }
+
+  li {
+    cursor: pointer;
+    padding: 3px 0px;
+  }
+}

@@ -1,4 +1,8 @@
-export const CUBES_CODE = `\
+import {makeCode} from './components/MultiFileEditor/MultiFileEditor'
+
+export const CUBES_CODE = {
+  "code.py": makeCode(`\
+from cube import send_cube
 colours = [
   0xFF0000,
   0xFFFF00,
@@ -18,11 +22,17 @@ for t in range(4):
     send_cube(x, y, colours[a % len(colours)] if t % 2 == 0 else 0)
     time.sleep(0.05)
   time.sleep(1)
-`
+`)}
 
-export const TURTLE_CODE = `\
+export const TURTLE_CODE = {
+  "code.py": makeCode(`\
+from turtle.movement import *
 forward(20)
 right(90)
 forward(20)
 shift_left(40)
-`
+`),
+  "folder": {
+    "test.py": makeCode('print("Hello World")'),
+  }
+}

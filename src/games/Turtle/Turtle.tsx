@@ -4,6 +4,7 @@ import { Sprite } from '@pixi/react-animated';
 import * as PIXI from 'pixi.js'
 
 import React from 'react';
+import { TreeStructure, makeCode } from '../../components/MultiFileEditor/MultiFileEditor';
 
 function deg2rad(degrees: number) : number
 {
@@ -13,29 +14,36 @@ function deg2rad(degrees: number) : number
 
 const code = `
 import time
+import json
+from utils.mocking import make_func
 
 FIXED_SLEEP = 0.5
-def forward(dist):
+@make_func
+def forward(old_print, dist):
     msg_obj = { "type": "forward", "dist": dist }
     old_print(json.dumps(msg_obj))
     time.sleep(FIXED_SLEEP)
 
-def backward(dist):
+@make_func
+def backward(old_print, dist):
     msg_obj = { "type": "backward", "dist": dist }
     old_print(json.dumps(msg_obj))
     time.sleep(FIXED_SLEEP)
 
-def right(angle):
+@make_func
+def right(old_print, angle):
     msg_obj = { "type": "right", "angle": angle }
     old_print(json.dumps(msg_obj))
     time.sleep(FIXED_SLEEP)
 
-def left(angle):
+@make_func
+def left(old_print, angle):
     msg_obj = { "type": "left", "angle": angle }
     old_print(json.dumps(msg_obj))
     time.sleep(FIXED_SLEEP)
 
-def shift_move(angle, dist):
+@make_func
+def shift_move(old_print, angle, dist):
     msg_obj = { "type": "shift_move", "angle": angle, "dist": dist }
     old_print(json.dumps(msg_obj))
     time.sleep(FIXED_SLEEP)
@@ -124,8 +132,12 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
     this.setState({ width, height });
   }
 
-  getPythonPreamble(): string {
-    return code;
+  getPythonPreamble(): TreeStructure {
+    return {
+      "turtle": {
+        "movement.py": makeCode(code)
+      }
+    };
   }
 
   render() {

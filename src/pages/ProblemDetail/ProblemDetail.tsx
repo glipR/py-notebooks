@@ -2,7 +2,6 @@ import React, { ReactElement } from 'react';
 
 import { useResizable } from "react-resizable-layout";
 import {indentWithTab} from "@codemirror/commands"
-import CodeMirror from '@uiw/react-codemirror'
 import { keymap } from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python'
 import { okaidia } from '@uiw/codemirror-theme-okaidia'
@@ -14,17 +13,19 @@ import styles from './ProblemDetail.module.css';
 
 import * as constants from './constants';
 import GameWindow from '../../components/GameWindow/GameWindow';
+import MultiFileEditor, { CodeBlock, TreeStructure, getCodeFromFolder, makeCode } from '../../components/MultiFileEditor/MultiFileEditor';
 
 type Props = {
   markdown_text: string;
-  template_code: string;
+  template_code: TreeStructure;
+  startScript: string;
   children: ReactElement;
   game_ref: React.RefObject<GameWindow>;
 };
 
 const extensions = [python(), keymap.of([indentWithTab])];
 
-const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children, game_ref }) => {
+const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children, game_ref, startScript }) => {
   const {
     position: contentW,
     separatorProps: contentDragBarProps,
@@ -57,7 +58,7 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
   const [codeValue, setCode] = React.useState(template_code);
   const [stdoutValue, setStdout] = React.useState('');
   const [lastAnalysed, setAnalysed] = React.useState(-1);
-  const {runPython, stdout, isLoading, isRunning} = usePython({
+  const {runPython, stdout, stderr, isLoading, isRunning, watchModules, writeFile, mkdir} = usePython({
     packages: {
       micropip: ['pyodide-http']
     }
@@ -92,7 +93,35 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
 
   // async method for onclick
   const playPressed = async () => {
-    await runPython(constants.PYTHON_PREAMBLE + '\n' + game_ref.current?.getPythonPreamble() + '\n' + codeValue);
+    const collectTree = (t: TreeStructure, prefix?: string, folderPath?: string): {path: string, modulePath: string, code: string}[] => {
+      let v:{path: string, modulePath: string, code: string}[] = [];
+      for (const key in t) {
+        const extensionless = key.split('.')[0];
+        const path = !!prefix ? `${prefix}.${extensionless}` : extensionless;
+        const actualPath = !!prefix ? `${folderPath}/${key}` : key;
+        if ('type' in t[key] && t[key].type === 'code') {
+          v.push({path: actualPath, modulePath: path, code: (t[key] as CodeBlock).code});
+        } else {
+          mkdir(actualPath)
+          v = [...v, ...collectTree(t[key] as TreeStructure, path, actualPath)];
+        }
+      }
+      return v;
+    }
+    const actualTree = {
+      ...codeValue,
+      utils: {
+        "mocking.py": makeCode(constants.UTILS_CODE)
+      },
+      ...game_ref.current?.getPythonPreamble()
+    }
+    const modules = collectTree(actualTree);
+    console.log(modules)
+    watchModules(modules.map(m => m.modulePath));
+    modules.forEach(({path, code}) => {
+      writeFile(path, code);
+    })
+    await runPython(constants.PYTHON_PREAMBLE + '\n' + getCodeFromFolder(actualTree, startScript)?.code);
   };
 
   return (
@@ -199,12 +228,13 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
             className={cn('code', styles.shrink)}
             style={{height: codeH - constants.CODE_VERTICAL_PADDING}}
           >
-            <CodeMirror
+            {stderr /* TODO: Make an actual stderr location (debugger?) */}
+            <MultiFileEditor
+              tree={codeValue}
               height={`${codeH - constants.CODE_VERTICAL_PADDING}px`}
-              value={codeValue}
               theme={okaidia}
               extensions={extensions}
-              onChange={(value) => setCode(value)}
+              onChange={setCode}
             />
           </div>
         }
