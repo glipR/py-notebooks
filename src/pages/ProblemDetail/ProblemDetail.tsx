@@ -71,7 +71,8 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
   const {runPython, stdout, stderr, isLoading, isRunning, watchModules, writeFile, sendInput, mkdir, isAwaitingInput} = usePython({
     packages: {
       micropip: ['pyodide-http']
-    }
+    },
+    printInput: false,
   });
 
   const [prevStderr, setPrevStderr] = React.useState('');
