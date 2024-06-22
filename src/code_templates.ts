@@ -27,6 +27,9 @@ for t in range(4):
 export const TURTLE_CODE = {
   "code.py": makeCode(`\
 from turtle.movement import *
+from turtle.sense import read_color
+col = read_color()
+print(col)
 forward(20)
 right(90)
 forward(20)

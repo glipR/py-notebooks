@@ -68,7 +68,7 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
   }, [])
 
   const [codeValue, setCode] = React.useState(template_code);
-  const {runPython, stderr, isLoading, isRunning, watchModules, writeFile, sendInput, mkdir, isAwaitingInput} = usePython({
+  const {runPython, stdout, stderr, isLoading, isRunning, watchModules, writeFile, sendInput, mkdir, isAwaitingInput} = usePython({
     packages: {
       micropip: ['pyodide-http']
     }
@@ -85,7 +85,7 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
 
   React.useEffect(() => {
     if (awaitingSends.length && isAwaitingInput) {
-      console.log("GAME:", awaitingSends[0])
+      console.log("GAME:", JSON.parse(awaitingSends[0]))
       sendInput(awaitingSends[0]);
       setAwaitingSends(prev => prev.slice(1))
     }
@@ -255,6 +255,7 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
             className={cn('code', styles.shrink)}
             style={{height: codeH - constants.CODE_VERTICAL_PADDING}}
           >
+            {stdout}
             {actualStderr /* TODO: Make an actual stderr location (debugger?) */}
             <MultiFileEditor
               tree={codeValue}

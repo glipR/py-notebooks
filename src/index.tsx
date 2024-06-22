@@ -39,7 +39,11 @@ const router = createBrowserRouter([
     path: "/noteboooks/2",
     element: (
     <ProblemDetail markdown_text={markdowns.TURTLE_MARKDOWN} template_code={templates.TURTLE_CODE} game_ref={ref2} startScript='code.py'>
-      <Turtles ref={ref2} areaHeight={100} areaWidth={100} />
+      <Turtles ref={ref2} areaHeight={100} areaWidth={200} splotches={[
+        { x: 10, y: 10, width: 20, height: 20, color: '#ef476f' },
+        { x: 70, y: 35, width: 60, height: 30, color: '#118ab2' },
+        { x: 140, y: 20, width: 40, height: 60, color: '#06d6a0' },
+      ]} />
     </ProblemDetail>
     )
   }

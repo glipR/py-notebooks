@@ -20,7 +20,7 @@ def wait_for_message(type: str, ingest: bool = True):
                 MESSAGES.remove(message)
             return message
     while True:
-        i = input("test")
+        i = input()
         try:
             message = json.loads(i)
         except:
