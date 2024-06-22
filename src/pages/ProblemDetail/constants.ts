@@ -2,24 +2,32 @@ export const CONTENT_HORIZONTAL_PADDING = 15;
 export const CODE_VERTICAL_PADDING = 32;
 export const DEBUGGER_VERTICAL_PADDING = 10;
 
-export const PYTHON_PREAMBLE = `\
-from utils.mocking import fake_print
-print = fake_print
-`
+export const PYTHON_PREAMBLE = ``
 
 export const UTILS_CODE = `\
 import json
-old_print = print
-def fake_print(*args, sep=' ', end='\\n'):
-    content = sep.join(map(str, args)) + end
-    msg_obj = { "type": "print", "content": content }
-    old_print(json.dumps(msg_obj))
-print = fake_print
+import sys
 
-def make_func(func):
-    def inner(*args, **kwargs):
-        return func(old_print, *args, **kwargs)
-    inner.__name__ = func.__name__
-    inner.__doc__ = func.__doc__
-    return inner
+def send_message(type: str, **kwargs):
+    obj = json.dumps({"type": type, **kwargs})
+    print(f"message=" + obj, file=sys.stderr)
+
+MESSAGES = []
+def wait_for_message(type: str, ingest: bool = True):
+    for message in MESSAGES:
+        if message.get("type") == type:
+            if ingest:
+                MESSAGES.remove(message)
+            return message
+    while True:
+        i = input("test")
+        try:
+            message = json.loads(i)
+        except:
+            raise ValueError(f"Error reading internal game communications. {i}")
+        if message.get("type") == type:
+            if not ingest:
+                MESSAGES.append(message)
+            return message
+        MESSAGES.append(message)
 `

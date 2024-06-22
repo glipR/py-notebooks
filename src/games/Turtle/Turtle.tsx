@@ -15,38 +15,28 @@ function deg2rad(degrees: number) : number
 const code = `
 import time
 import json
-from utils.mocking import make_func
+from utils.mocking import send_message, wait_for_message
 
 FIXED_SLEEP = 0.5
-@make_func
-def forward(old_print, dist):
-    msg_obj = { "type": "forward", "dist": dist }
-    old_print(json.dumps(msg_obj))
-    time.sleep(FIXED_SLEEP)
+def forward(dist):
+    send_message(type="forward", dist=dist)
+    wait_for_message("movement_complete")
 
-@make_func
-def backward(old_print, dist):
-    msg_obj = { "type": "backward", "dist": dist }
-    old_print(json.dumps(msg_obj))
-    time.sleep(FIXED_SLEEP)
+def backward(dist):
+    send_message(type="backward", dist=dist)
+    wait_for_message("movement_complete")
 
-@make_func
-def right(old_print, angle):
-    msg_obj = { "type": "right", "angle": angle }
-    old_print(json.dumps(msg_obj))
-    time.sleep(FIXED_SLEEP)
+def right(angle):
+    send_message(type="right", angle=angle)
+    wait_for_message("movement_complete")
 
-@make_func
-def left(old_print, angle):
-    msg_obj = { "type": "left", "angle": angle }
-    old_print(json.dumps(msg_obj))
-    time.sleep(FIXED_SLEEP)
+def left(angle):
+    send_message(type="left", angle=angle)
+    wait_for_message("movement_complete")
 
-@make_func
-def shift_move(old_print, angle, dist):
-    msg_obj = { "type": "shift_move", "angle": angle, "dist": dist }
-    old_print(json.dumps(msg_obj))
-    time.sleep(FIXED_SLEEP)
+def shift_move(angle, dist):
+    send_message(type="shift_move", angle=angle, dist=dist)
+    wait_for_message("movement_complete")
 
 def shift_left(dist):
     shift_move(180, dist)
@@ -61,9 +51,11 @@ def shift_down(dist):
     shift_move(270, dist)
 `
 
+const FIXED_DURATION = 500;
+
 const config = {
   stage: {antialias: true, background: 0x2D3032},
-  spring: {duration: 500, delay: 0, precision: 0.01, ease: (t: number) => t * t * t * t},
+  spring: {duration: FIXED_DURATION, delay: 0, precision: 0.01, ease: (t: number) => t * t * t * t},
 }
 
 interface TurtleState {
@@ -92,7 +84,7 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
     };
   }
 
-  ingestMessage(obj: any):void {
+  ingestMessage(obj: any, sendInput: (x: string) => void):void {
     const { turtleBearing, turtleX, turtleY } = this.state;
     if (obj.type === 'forward') {
       const dist = obj.dist;
@@ -109,23 +101,24 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
     } else if (obj.type === "right") {
       const angle = obj.angle;
       this.setState({
-        turtleBearing: turtleBearing - angle,
+        turtleBearing: turtleBearing + angle,
       });
     }
     else if (obj.type === "left") {
       const angle = obj.angle;
       this.setState({
-        turtleBearing: turtleBearing + angle,
+        turtleBearing: turtleBearing - angle,
       });
     }
     else if (obj.type === "shift_move") {
       const angle = obj.angle;
       const dist = obj.dist;
       this.setState({
-        turtleX: turtleX + dist * Math.cos(deg2rad(angle)),
-        turtleY: turtleY + dist * Math.sin(deg2rad(angle)),
+        turtleX: turtleX + dist * Math.cos(- deg2rad(angle)),
+        turtleY: turtleY + dist * Math.sin(- deg2rad(angle)),
       });
     }
+    setTimeout(() => sendInput(JSON.stringify({"type": "movement_complete"})), FIXED_DURATION);
   }
 
   setDimensions(width: number, height: number):void {

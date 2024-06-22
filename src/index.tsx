@@ -15,6 +15,7 @@ import Turtles from './games/Turtle/Turtle';
 import ProblemDetail from './pages/ProblemDetail/ProblemDetail';
 import * as markdowns from './markdown_texts';
 import * as templates from './code_templates';
+import { PythonProvider } from 'react-py';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -47,7 +48,9 @@ const router = createBrowserRouter([
 root.render(
   <React.StrictMode>
     <Provider store={store}>
+      <PythonProvider>
       <RouterProvider router={router} />
+      </PythonProvider>
     </Provider>
   </React.StrictMode>
 );

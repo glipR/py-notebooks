@@ -9,12 +9,10 @@ import { TreeStructure, makeCode } from '../../components/MultiFileEditor/MultiF
 
 const code = `
 import json
-from utils.mocking import make_func
+from utils.mocking import send_message
 
-@make_func
-def send_cube(old_print, x, y, color):
-    msg_obj = { "type": "cube", "x": x, "y": y, "color": color }
-    old_print(json.dumps(msg_obj))
+def send_cube(x, y, color):
+    send_message(type="cube", x=x, y=y, color=color)
 `
 
 const toHex = (color: string) =>
@@ -60,7 +58,7 @@ export default class GridSquares extends React.Component<GridSquareProps, GridSq
     };
   }
 
-  ingestMessage(obj: any):void {
+  ingestMessage(obj: any, sendInput: (x: string) => void):void {
     const { colors } = this.state;
     if (obj.type === 'cube') {
       const newGrid = [...colors];

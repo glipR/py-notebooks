@@ -5,7 +5,7 @@ import {indentWithTab} from "@codemirror/commands"
 import { keymap } from '@uiw/react-codemirror';
 import { python } from '@codemirror/lang-python'
 import { okaidia } from '@uiw/codemirror-theme-okaidia'
-import { PythonProvider, usePython } from 'react-py'
+import { usePython } from 'react-py'
 import StyledMarkdown from '../../components/StyledMarkdown/StyledMarkdown';
 
 import { cn } from '../../utils/cn';
@@ -55,44 +55,63 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
     reverse: true,
   })
 
+  React.useEffect(() => {
+    navigator.serviceWorker
+      .register('/react-py-sw.js')
+      .then((registration) =>
+        console.log(
+          'Service Worker registration successful with scope: ',
+          registration.scope
+        )
+      )
+      .catch((err) => console.log('Service Worker registration failed: ', err))
+  }, [])
+
   const [codeValue, setCode] = React.useState(template_code);
-  const [stdoutValue, setStdout] = React.useState('');
-  const [lastAnalysed, setAnalysed] = React.useState(-1);
-  const {runPython, stdout, stderr, isLoading, isRunning, watchModules, writeFile, mkdir} = usePython({
+  const {runPython, stderr, isLoading, isRunning, watchModules, writeFile, sendInput, mkdir, isAwaitingInput} = usePython({
     packages: {
       micropip: ['pyodide-http']
     }
   });
+
+  const [prevStderr, setPrevStderr] = React.useState('');
+  const [actualStderr, setActualStderr] = React.useState('');
+  const [writtenFiles, setWrittenFiles] = React.useState<{[key: string]: boolean}>({})
+  const [awaitingSends, setAwaitingSends] = React.useState<string[]>([]);
 
   const gameHeight = window.innerHeight - codeH - 10;
   const gameWidth = window.innerWidth - contentW - 10;
   game_ref.current?.setDimensions(gameWidth, gameHeight);
 
   React.useEffect(() => {
-    if (stdoutValue !== stdout) {
-      let curAnalysed = lastAnalysed;
-      if (!stdout.startsWith(stdoutValue)) {
-        curAnalysed = -1;
-      }
-      const lines = stdout.split('\n');
-      while (curAnalysed < lines.length - 1) {
-        const line = lines[curAnalysed + 1];
-        curAnalysed = curAnalysed + 1;
-        let obj: any = undefined;
-        try {
-          obj = JSON.parse(line);
-        } catch (e) {}
-        if (obj !== undefined) {
-          game_ref.current?.ingestMessage(obj)
-        }
-      }
-      setAnalysed(curAnalysed);
-      setStdout(stdout);
+    if (awaitingSends.length && isAwaitingInput) {
+      console.log("GAME:", awaitingSends[0])
+      sendInput(awaitingSends[0]);
+      setAwaitingSends(prev => prev.slice(1))
     }
-  }, [stdout, stdoutValue, lastAnalysed, game_ref]);
+  }, [isAwaitingInput, awaitingSends, sendInput])
+
+  React.useEffect(() => {
+    if (stderr !== prevStderr) {
+      const newLines = stderr.split('\n').splice(prevStderr.split('\n').length - (prevStderr === '' ? 1 : 0))
+      newLines.forEach((line) => {
+        if (line.startsWith('message=')) {
+          const msg = JSON.parse(line.split('message=')[1]);
+          console.log("PROC:", msg)
+          game_ref.current?.ingestMessage(msg, s => {
+            setAwaitingSends(prev => [...prev, s])
+          });
+        }
+      })
+      const newActual = newLines.filter((line) => !line.startsWith('message=')).join('\n');
+      setActualStderr(a => a + (!!newActual ? '\n' : '') + newActual);
+      setPrevStderr(stderr);
+    }
+  }, [stderr, game_ref, prevStderr, sendInput, isAwaitingInput]);
 
   // async method for onclick
   const playPressed = async () => {
+    const curFiles = {...writtenFiles}
     const collectTree = (t: TreeStructure, prefix?: string, folderPath?: string): {path: string, modulePath: string, code: string}[] => {
       let v:{path: string, modulePath: string, code: string}[] = [];
       for (const key in t) {
@@ -102,7 +121,10 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
         if ('type' in t[key] && t[key].type === 'code') {
           v.push({path: actualPath, modulePath: path, code: (t[key] as CodeBlock).code});
         } else {
-          mkdir(actualPath)
+          if (!writtenFiles[actualPath]) {
+            mkdir(actualPath)
+            curFiles[actualPath] = true;
+          }
           v = [...v, ...collectTree(t[key] as TreeStructure, path, actualPath)];
         }
       }
@@ -114,18 +136,23 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
         "mocking.py": makeCode(constants.UTILS_CODE)
       },
       ...game_ref.current?.getPythonPreamble()
-    }
+    };
+    ['communication', 'communication/process', 'communication/game'].forEach(folder => {
+      if (!writtenFiles[folder]) {
+        mkdir(folder)
+        curFiles[folder] = true;
+      }
+    })
     const modules = collectTree(actualTree);
-    console.log(modules)
     watchModules(modules.map(m => m.modulePath));
     modules.forEach(({path, code}) => {
       writeFile(path, code);
     })
+    setWrittenFiles(curFiles)
     await runPython(constants.PYTHON_PREAMBLE + '\n' + getCodeFromFolder(actualTree, startScript)?.code);
   };
 
   return (
-    <PythonProvider>
     <div
       className={styles.windowContainer}
     >
@@ -228,7 +255,7 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
             className={cn('code', styles.shrink)}
             style={{height: codeH - constants.CODE_VERTICAL_PADDING}}
           >
-            {stderr /* TODO: Make an actual stderr location (debugger?) */}
+            {actualStderr /* TODO: Make an actual stderr location (debugger?) */}
             <MultiFileEditor
               tree={codeValue}
               height={`${codeH - constants.CODE_VERTICAL_PADDING}px`}
@@ -258,7 +285,6 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
         </div>
       </div>
     </div>
-    </PythonProvider>
   );
 };
 
