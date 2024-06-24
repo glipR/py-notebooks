@@ -88,6 +88,11 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
   game_ref.current?.setDimensions(gameWidth, gameHeight);
 
   React.useEffect(() => {
+    const term = document.querySelector("." + styles.terminal);
+    term?.scrollTo(0, term.scrollHeight);
+  }, [stdout])
+
+  React.useEffect(() => {
     if (awaitingSends.length && isAwaitingInput) {
       console.log("GAME:", JSON.parse(awaitingSends[0]))
       sendInput(awaitingSends[0]);
@@ -259,7 +264,6 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
             className={cn('code', styles.shrink)}
             style={{height: codeH - constants.CODE_VERTICAL_PADDING}}
           >
-            {stdout}
             {actualStderr /* TODO: Make an actual stderr location (debugger?) */}
             <MultiFileEditor
               tree={codeValue}
@@ -284,6 +288,11 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
             />
             </>
           }
+          {stdout && <div className={styles.terminal}>
+            <code>
+            {stdout}
+            </code>
+          </div>}
         </div>
         <div className={cn('game', styles.grow)}>
         {children}
