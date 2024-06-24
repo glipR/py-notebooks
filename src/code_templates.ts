@@ -36,6 +36,10 @@ forward(20)
 shift_left(40)
 `, '|', false),
   "folder": {
-    "test.py": makeCode('print("Hello World")'),
+    "test.py": makeCode(`\
+print("Hello World")
+|name = "Jackson"|
+print(f"Hello {name}")
+`, '|', true, true),
   }
 }

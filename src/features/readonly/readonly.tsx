@@ -39,8 +39,13 @@ type ReadonlyEffect = {
   from: number;
   to: number;
 };
+type EditableEffect = {
+  from: number;
+  to: number;
+};
 
 const addReadonlyEffect = StateEffect.define<ReadonlyEffect>();
+const addEditableEffect = StateEffect.define<EditableEffect>();
 
 export const makeGetReadOnlyEffect = (startText: string, readOnlyDelimiter: string, startReadonly: boolean) => {
   // Makes the getReadOnlyEffect function by finding the location of the delimited string within the targetState string.
@@ -49,9 +54,22 @@ export const makeGetReadOnlyEffect = (startText: string, readOnlyDelimiter: stri
       return;
     }
     const effects: StateEffect<ReadonlyEffect>[] = [];
-    getFields(startText, readOnlyDelimiter, view.state.doc.toString(), startReadonly).forEach(({from, to}, i) => {
+    const fields = getFields(startText, readOnlyDelimiter, view.state.doc.toString(), startReadonly);
+    fields.forEach(({from, to}, i) => {
       effects.push(addReadonlyEffect.of({from, to}));
     });
+    if (fields.length > 0 && fields[0].from !== 0) {
+      effects.push(addEditableEffect.of({from: 0, to: fields[0].from}));
+    }
+    for (let i = 0; i < fields.length - 1; i += 1) {
+      const {to} = fields[i];
+      const {from} = fields[i + 1];
+      effects.push(addEditableEffect.of({from: to, to: from}));
+    }
+    if (fields.length > 0 && fields[fields.length - 1].to !== view.state.doc.length) {
+      effects.push(addEditableEffect.of({from: fields[fields.length - 1].to, to: view.state.doc.length}));
+    }
+
     if (effects.length > 0) {
       view.view.dispatch({ effects });
     }
@@ -64,12 +82,34 @@ export const makeReadonlyDecorationField = (startText: string, readOnlyDelimiter
     create(state: EditorState) {
       const start = Decoration.none;
       const marks: Range<Decoration>[] = [];
-      getFields(startText, readOnlyDelimiter, state.doc.toString(), startReadonly).forEach(({from, to}, i) => {
+      const fields = getFields(startText, readOnlyDelimiter, state.doc.toString(), startReadonly);
+      fields.forEach(({from, to}, i) => {
         marks.push(Decoration.mark({
           inclusiveEnd: true,
           class: "is-readonly"
         }).range(from, to));
       });
+      if (fields.length > 0 && fields[0].from !== 0) {
+        marks.push(Decoration.mark({
+          inclusiveEnd: true,
+          class: "is-editable"
+        }).range(0, fields[0].from));
+      }
+      for (let i = 0; i < fields.length - 1; i += 1) {
+        const {to} = fields[i];
+        const {from} = fields[i + 1];
+        marks.push(Decoration.mark({
+          inclusiveEnd: true,
+          class: "is-editable"
+        }).range(to, from));
+      }
+      if (fields.length > 0 && fields[fields.length - 1].to !== state.doc.length) {
+        marks.push(Decoration.mark({
+          inclusiveEnd: true,
+          class: "is-editable"
+        }).range(fields[fields.length - 1].to, state.doc.length));
+      }
+      marks.sort((a, b) => a.from - b.from);
       return start.update({
         add: marks,
       });
@@ -78,18 +118,27 @@ export const makeReadonlyDecorationField = (startText: string, readOnlyDelimiter
       let readonlyDecorationsRangeSet = readonlyDecoration.map(tr.changes);
       const marks: Range<Decoration>[] = [];
       tr.effects.forEach((effect) => {
-        if (!effect.is(addReadonlyEffect)) {
-          return;
+        if (effect.is(addReadonlyEffect)) {
+          const { from, to } = effect.value;
+
+          const mark = Decoration.mark({
+            inclusiveEnd: true,
+            class: "is-readonly"
+          }).range(from, to);
+
+          marks.push(mark);
+        } else if (effect.is(addEditableEffect)) {
+          const { from, to } = effect.value;
+
+          const mark = Decoration.mark({
+            inclusiveEnd: true,
+            class: "is-editable"
+          }).range(from, to);
+
+          marks.push(mark);
         }
-        const { from, to } = effect.value;
-
-        const mark = Decoration.mark({
-          inclusiveEnd: true,
-          class: "is-readonly"
-        }).range(from, to);
-
-        marks.push(mark);
       });
+      marks.sort((a, b) => a.from - b.from);
       readonlyDecorationsRangeSet = readonlyDecorationsRangeSet.update({
         add: marks,
       });

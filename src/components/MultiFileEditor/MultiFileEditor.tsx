@@ -26,15 +26,17 @@ export interface CodeBlock {
   templateCode?: string;
   delimiter?: string;
   startReadonly?: boolean;
+  invertStyling?: boolean;
 }
 
-export const makeCode = (code: string, delimiter?: string, startReadonly?: boolean): CodeBlock => {
+export const makeCode = (code: string, delimiter?: string, startReadonly?: boolean, invertStyling?: boolean): CodeBlock => {
   return {
     type: 'code',
     code: delimiter ? code.replaceAll(delimiter, '') : code,
     templateCode: code,
     delimiter,
     startReadonly,
+    invertStyling,
   }
 }
 
@@ -188,7 +190,7 @@ const TreeRenderer: React.FC<TreeStructureProps> = ({tree, prefix, fileSelected,
   </div>
 }
 
-const readonlyExtensions = (startText: string, delimiter?: string, startReadonly?: boolean): Extension[] => {
+const readonlyExtensions = (startText: string, delimiter?: string, startReadonly?: boolean, invertStyling?: boolean): Extension[] => {
   if (!delimiter) return []
   const readonlyEffect = makeGetReadOnlyEffect(startText, delimiter, !!startReadonly);
   const ranges = makeGetReadOnlyRanges(startText, delimiter, !!startReadonly);
@@ -198,7 +200,11 @@ const readonlyExtensions = (startText: string, delimiter?: string, startReadonly
     readOnlyRangesExtension(ranges),
     EditorView.updateListener.of(readonlyEffect),
     decoration,
-    EditorView.theme({
+    EditorView.theme(invertStyling ? {
+      ".is-editable": {
+        backgroundColor: "green"
+      }
+    } : {
       ".is-readonly": {
         backgroundColor: "red"
       }
@@ -306,7 +312,7 @@ const MultiFileEditor: React.FC<MultiFileEditorProps> = ({ tree, onChange, heigh
     height={height}
     value={currentCode?.code || ''}
     theme={theme}
-    extensions={currentCode?.delimiter ? [...extensions, readonlyExtensions(currentCode.templateCode!, currentCode.delimiter, currentCode.startReadonly)] : extensions}
+    extensions={currentCode?.delimiter ? [...extensions, readonlyExtensions(currentCode.templateCode!, currentCode.delimiter, currentCode.startReadonly, currentCode.invertStyling)] : extensions}
     onChange={(value) => processCodeUpdate(value)}
   />}
   </div>
