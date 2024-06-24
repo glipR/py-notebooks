@@ -23,7 +23,10 @@ type Props = {
   game_ref: React.RefObject<GameWindow>;
 };
 
-const extensions = [python(), keymap.of([indentWithTab])];
+const extensions = [
+  python(),
+  keymap.of([indentWithTab]),
+];
 
 const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children, game_ref, startScript }) => {
   const {

@@ -28,13 +28,13 @@ export const TURTLE_CODE = {
   "code.py": makeCode(`\
 from turtle.movement import *
 from turtle.sense import read_color
-col = read_color()
+|col = read_color()|
 print(col)
 forward(20)
 right(90)
 forward(20)
 shift_left(40)
-`),
+`, '|', false),
   "folder": {
     "test.py": makeCode('print("Hello World")'),
   }

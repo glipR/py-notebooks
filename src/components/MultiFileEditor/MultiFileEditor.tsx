@@ -1,10 +1,12 @@
 import React from "react"
-import CodeMirror from '@uiw/react-codemirror'
+import CodeMirror, { EditorView } from '@uiw/react-codemirror'
 import { Extension } from "@uiw/react-codemirror";
 
 import styles from './MultiFileEditor.module.css'
 import { cn } from "../../utils/cn";
 import { createRoot } from "react-dom/client";
+import { makeGetReadOnlyEffect, makeGetReadOnlyRanges, makeReadonlyDecorationField } from "../../features/readonly/readonly";
+import readOnlyRangesExtension from "codemirror-readonly-ranges";
 
 // TODO:
 // Download files as zip, folders and files add this to context menu.
@@ -21,12 +23,18 @@ interface MultiFileEditorProps {
 export interface CodeBlock {
   type: 'code';
   code: string;
+  templateCode?: string;
+  delimiter?: string;
+  startReadonly?: boolean;
 }
 
-export const makeCode = (code: string): CodeBlock => {
+export const makeCode = (code: string, delimiter?: string, startReadonly?: boolean): CodeBlock => {
   return {
     type: 'code',
-    code: code
+    code: delimiter ? code.replaceAll(delimiter, '') : code,
+    templateCode: code,
+    delimiter,
+    startReadonly,
   }
 }
 
@@ -180,6 +188,24 @@ const TreeRenderer: React.FC<TreeStructureProps> = ({tree, prefix, fileSelected,
   </div>
 }
 
+const readonlyExtensions = (startText: string, delimiter?: string, startReadonly?: boolean): Extension[] => {
+  if (!delimiter) return []
+  const readonlyEffect = makeGetReadOnlyEffect(startText, delimiter, !!startReadonly);
+  const ranges = makeGetReadOnlyRanges(startText, delimiter, !!startReadonly);
+  const decoration = makeReadonlyDecorationField(startText, delimiter, !!startReadonly);
+
+  return [
+    readOnlyRangesExtension(ranges),
+    EditorView.updateListener.of(readonlyEffect),
+    decoration,
+    EditorView.theme({
+      ".is-readonly": {
+        backgroundColor: "red"
+      }
+    })
+  ];
+}
+
 export const getCodeFromFolder = (totalTree: TreeStructure, folderPath: string) : CodeBlock | undefined => {
   var p = folderPath;
   var obj = totalTree;
@@ -233,6 +259,7 @@ const MultiFileEditor: React.FC<MultiFileEditorProps> = ({ tree, onChange, heigh
   }
 
   const contextRef = React.useRef<HTMLDivElement>(null);
+  const currentCode = getCodeFromFolder(tree, currentFile);
 
   return <div className={styles.editorView}>
     <div
@@ -277,9 +304,9 @@ const MultiFileEditor: React.FC<MultiFileEditorProps> = ({ tree, onChange, heigh
     {currentFile !== undefined && <CodeMirror
     className={styles.codeView}
     height={height}
-    value={getCodeFromFolder(tree, currentFile)?.code || ''}
+    value={currentCode?.code || ''}
     theme={theme}
-    extensions={extensions}
+    extensions={currentCode?.delimiter ? [...extensions, readonlyExtensions(currentCode.templateCode!, currentCode.delimiter, currentCode.startReadonly)] : extensions}
     onChange={(value) => processCodeUpdate(value)}
   />}
   </div>
