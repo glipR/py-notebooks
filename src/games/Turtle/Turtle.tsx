@@ -168,6 +168,8 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
       ));
       if (splotch !== undefined) {
         sendInput?.(JSON.stringify({type: "color_read", color: hex2rgb(splotch.color)}));
+      } else {
+        sendInput?.(JSON.stringify({type: "color_read", color: [0, 0, 0]}));
       }
     }
     this.setState({ sendInput });
