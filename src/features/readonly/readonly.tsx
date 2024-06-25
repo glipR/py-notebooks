@@ -98,6 +98,7 @@ export const makeReadonlyDecorationField = (startText: string, readOnlyDelimiter
       for (let i = 0; i < fields.length - 1; i += 1) {
         const {to} = fields[i];
         const {from} = fields[i + 1];
+        if (to === from) continue;
         marks.push(Decoration.mark({
           inclusiveEnd: true,
           class: "is-editable"
@@ -120,6 +121,9 @@ export const makeReadonlyDecorationField = (startText: string, readOnlyDelimiter
       tr.effects.forEach((effect) => {
         if (effect.is(addReadonlyEffect)) {
           const { from, to } = effect.value;
+          if (from === to) {
+            return
+          }
 
           const mark = Decoration.mark({
             inclusiveEnd: true,
