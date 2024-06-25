@@ -84,10 +84,19 @@ interface ColorSplotch {
   color: string;
 }
 
+interface Wall {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  color: string;
+}
+
 interface TurtleProps {
   areaWidth: number;
   areaHeight: number;
   splotches?: ColorSplotch[];
+  walls?: Wall[];
 }
 
 const hex2rgb = (hex: string) => {
@@ -204,6 +213,17 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
               width={splotch.width * actualWidth / areaWidth}
               height={splotch.height * actualHeight / areaHeight}
               tint={splotch.color}
+            />
+          ))}
+          {this.props.walls?.map((wall, i) => (
+            <Sprite
+              key={`wall-${i}`}
+              texture={PIXI.Texture.WHITE}
+              x={wall.x * actualWidth / areaWidth}
+              y={wall.y * actualHeight / areaHeight}
+              width={wall.width * actualWidth / areaWidth}
+              height={wall.height * actualHeight / areaHeight}
+              tint={wall.color}
             />
           ))}
           <Spring onRest={() => this.onRest(this)} config={springConfig} to={{

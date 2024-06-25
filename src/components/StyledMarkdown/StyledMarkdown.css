@@ -10,11 +10,16 @@
   }
 
   &.warning {
-    background-color: #88623380;
+    background-color: #aaac2a80;
   }
 
   &.success {
     background-color: #28a42680;
+  }
+
+  &.hint {
+    background-color: #b62fb480;
+
   }
 }
 
