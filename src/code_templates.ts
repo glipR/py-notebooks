@@ -1,5 +1,18 @@
 import {makeCode} from './components/MultiFileEditor/MultiFileEditor'
 
+export const TERMINAL_CODE = {
+  "code.py": makeCode(`\
+print("Hello World")
+name = "Jackson"
+print("Hello", name, "let's count to 10!")
+
+import time
+for i in range(1, 11):
+  print(i)
+  time.sleep(0.5)
+`)
+}
+
 export const CUBES_CODE = {
   "code.py": makeCode(`\
 from cube import send_cube

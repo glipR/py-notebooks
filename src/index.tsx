@@ -12,6 +12,7 @@ import {
 } from "react-router-dom";
 import GridSquares from './games/GridSquares/GridSquares';
 import Turtles from './games/Turtle/Turtle';
+import Terminals from './games/Terminal/Terminal';
 import ProblemDetail from './pages/ProblemDetail/ProblemDetail';
 import * as markdowns from './markdown_texts';
 import * as templates from './code_templates';
@@ -22,6 +23,7 @@ const root = createRoot(container);
 
 let ref1 = createRef<GridSquares>();
 let ref2 = createRef<Turtles>();
+let ref3 = createRef<Terminals>();
 const router = createBrowserRouter([
   {
     path: "/",
@@ -46,7 +48,15 @@ const router = createBrowserRouter([
       ]} />
     </ProblemDetail>
     )
-  }
+  },
+  {
+    path: "/noteboooks/3",
+    element: (
+    <ProblemDetail markdown_text={markdowns.WELCOME_MARKDOWN} template_code={templates.TERMINAL_CODE} game_ref={ref3} startScript='code.py'>
+      <Terminals ref={ref3} />
+    </ProblemDetail>
+    )
+  },
 ]);
 
 root.render(

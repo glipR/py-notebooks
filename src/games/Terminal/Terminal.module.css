@@ -1,0 +1,12 @@
+.terminal {
+  white-space: pre-line;
+  background-color: #333333;
+  color: #dddddd;
+  font-size: 20px;
+  overflow-y: auto;
+}
+.terminal_code {
+  padding: 5px 10px;
+  width: 100%;
+  display: block;
+}

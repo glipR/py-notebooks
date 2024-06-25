@@ -85,12 +85,16 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
 
   const gameHeight = window.innerHeight - codeH - 10;
   const gameWidth = window.innerWidth - contentW - 10;
-  game_ref.current?.setDimensions(gameWidth, gameHeight);
+  game_ref.current?.setDimensions?.(gameWidth, gameHeight);
 
   React.useEffect(() => {
     const term = document.querySelector("." + styles.terminal);
     term?.scrollTo(0, term.scrollHeight);
   }, [stdout])
+
+  React.useEffect(() => {
+    game_ref.current?.setStdout?.(stdout);
+  }, [stdout, game_ref])
 
   React.useEffect(() => {
     if (awaitingSends.length && isAwaitingInput) {
@@ -107,7 +111,7 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
         if (line.startsWith('message=')) {
           const msg = JSON.parse(line.split('message=')[1]);
           console.log("PROC:", msg)
-          game_ref.current?.ingestMessage(msg, s => {
+          game_ref.current?.ingestMessage?.(msg, s => {
             setAwaitingSends(prev => [...prev, s])
           });
         }
@@ -144,7 +148,7 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
       utils: {
         "mocking.py": makeCode(constants.UTILS_CODE)
       },
-      ...game_ref.current?.getPythonPreamble()
+      ...game_ref.current?.getPythonPreamble?.()
     };
     ['communication', 'communication/process', 'communication/game'].forEach(folder => {
       if (!writtenFiles[folder]) {
@@ -288,7 +292,7 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
             />
             </>
           }
-          {stdout && <div className={styles.terminal}>
+          {stdout && !game_ref.current?.terminalDisabled && <div className={styles.terminal}>
             <code>
             {stdout}
             </code>
