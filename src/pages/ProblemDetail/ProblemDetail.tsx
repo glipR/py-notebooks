@@ -21,6 +21,8 @@ type Props = {
   startScript: string;
   children: ReactElement;
   game_ref: React.RefObject<GameWindow>;
+  startX?: number;
+  startY?: number;
 };
 
 const extensions = [
@@ -28,14 +30,14 @@ const extensions = [
   keymap.of([indentWithTab]),
 ];
 
-const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children, game_ref, startScript }) => {
+const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children, game_ref, startScript, startX, startY }) => {
   const {
     position: contentW,
     separatorProps: contentDragBarProps,
     setPosition: contentDragBarSet,
   } = useResizable({
     axis: "x",
-    initial: 450,
+    initial: startX ?? 700,
     min: 0
   });
   const {
@@ -44,7 +46,7 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
     setPosition: codeDragBarSet,
   } = useResizable({
     axis: "y",
-    initial: 600,
+    initial: startY ?? 600,
     min: 0
   });
   const {

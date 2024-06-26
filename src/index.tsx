@@ -17,6 +17,9 @@ import ProblemDetail from './pages/ProblemDetail/ProblemDetail';
 import * as markdowns from './markdown_texts';
 import * as templates from './code_templates';
 import { PythonProvider } from 'react-py';
+import { intro1, intro2, intro3 } from './courses/python/01_Intro_Nums';
+import { strings1, strings2 } from './courses/python/02_Strings';
+import { variables1, variables2, variables3 } from './courses/python/03_Variables';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -30,7 +33,7 @@ const router = createBrowserRouter([
     element: <App />,
   },
   {
-    path: "/noteboooks/1",
+    path: "/notebooks/1",
     element: (
     <ProblemDetail markdown_text={markdowns.WELCOME_MARKDOWN} template_code={templates.CUBES_CODE} game_ref={ref1} startScript='code.py'>
       <GridSquares ref={ref1} gridHeight={3} gridWidth={10} />
@@ -38,7 +41,7 @@ const router = createBrowserRouter([
     )
   },
   {
-    path: "/noteboooks/2",
+    path: "/notebooks/2",
     element: (
     <ProblemDetail markdown_text={markdowns.TURTLE_MARKDOWN} template_code={templates.TURTLE_CODE} game_ref={ref2} startScript='code.py'>
       <Turtles ref={ref2} areaHeight={100} areaWidth={200} splotches={[
@@ -50,12 +53,44 @@ const router = createBrowserRouter([
     )
   },
   {
-    path: "/noteboooks/3",
+    path: "/notebooks/3",
     element: (
     <ProblemDetail markdown_text={markdowns.WELCOME_MARKDOWN} template_code={templates.TERMINAL_CODE} game_ref={ref3} startScript='code.py'>
       <Terminals ref={ref3} />
     </ProblemDetail>
     )
+  },
+  {
+    path: "/notebooks/intro/1",
+    element: intro1,
+  },
+  {
+    path: "/notebooks/intro/2",
+    element: intro2,
+  },
+  {
+    path: "/notebooks/intro/3",
+    element: intro3,
+  },
+  {
+    path: "/notebooks/strings/1",
+    element: strings1,
+  },
+  {
+    path: "/notebooks/strings/2",
+    element: strings2,
+  },
+  {
+    path: "/notebooks/variables/1",
+    element: variables1,
+  },
+  {
+    path: "/notebooks/variables/2",
+    element: variables2,
+  },
+  {
+    path: "/notebooks/variables/3",
+    element: variables3,
   },
 ]);
 
