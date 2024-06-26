@@ -122,6 +122,42 @@ export const variables2 = (
 </ProblemDetail> );
 
 const variables3MD = `\
+## Challenge #2
+
+Let's get more comfortable with modifying variables with a few challenges.
+
+First off, swapping variables. In the code example on the right, write some code that will move whatever is stored in a into b, and vice versa.
+
+:::note{.warning}
+Remember that each instruction is executed one after the other. So you can't execute any line that would overwrite \`a\` or \`b\` without first copying their value elsewhere.
+:::
+
+:::note{.hint}
+Rather than worrying about getting \`a\` and \`b\` to have these new values. The problem would be a lot easier if we just had to store the swapped values in new variables \`c\` and \`d\`, right?
+If so, then after doing that you're just one step away from updating \`a\` and \`b\`!
+:::
+
+`;
+const variables3Code = {
+  "code.py": makeCode(`\
+a = "hello"
+b = "world"
+|# Your code here...
+# You might need multiple lines|
+print(b, a) # Should print 'hello world'
+`, '|', true, false)
+}
+const variables3Ref = createRef<Terminals>();
+export const variables3 = (
+<ProblemDetail
+  markdown_text={variables3MD}
+  template_code={variables3Code}
+  game_ref={variables3Ref}
+  startScript='code.py'>
+  <Terminals ref={variables3Ref} />
+</ProblemDetail> );
+
+const variables4MD = `\
 ## Variables defining themselves?
 
 Let's dig deeper into how variables actually work and are understood by Python. While the way we write variable setting looks like math equality, it's important we understand the key differences that sets the two apart.
@@ -160,7 +196,7 @@ So when we get to \`var1 = var1 + var1\`, we first evaluate \`var1 + var1\`. Thi
 
 Fix the code on the right so that 8 is printed for z.
 `;
-const variables3Code = {
+const variables4Code = {
   "code.py": makeCode(`\
 z = y + x
 x = 3
@@ -173,12 +209,48 @@ var1 = var1 + var1
 print(var1)
 `)
 }
-const variables3Ref = createRef<Terminals>();
-export const variables3 = (
+const variables4Ref = createRef<Terminals>();
+export const variables4 = (
 <ProblemDetail
-  markdown_text={variables3MD}
-  template_code={variables3Code}
-  game_ref={variables3Ref}
+  markdown_text={variables4MD}
+  template_code={variables4Code}
+  game_ref={variables4Ref}
   startScript='code.py'>
-  <Terminals ref={variables3Ref} />
+  <Terminals ref={variables4Ref} />
+</ProblemDetail> );
+
+const variables5MD = `\
+## Challenge #3
+
+Now we've got self-modification under our belt, let's cap variables off with one last challenge, then we can move onto more interesting stuff than this bland terminal in the bottom right.
+
+The code on the right computes some value, but we're unsure what of.
+
+In the green section, enter the number you think is stored in \`val\`. Don't worry too much about the last line of the code for now. We'll cover what it means in due time.
+
+:::note{.hint}
+Feeling stuck? Pull out a pen and paper and jot down the values of \`val\` after each line.
+:::
+
+:::note{.info}
+Not a helpful hint, but how else could we make this code print \`true\` without guessing the value of \`val\`?
+:::
+`;
+const variables5Code = {
+  "code.py": makeCode(`\
+val = 1
+val = (val + val) * (val + val)
+val = (val * 3) * (val - 2)
+val = val - 20
+print(val == |?|)
+`, '|', true, true)
+}
+const variables5Ref = createRef<Terminals>();
+export const variables5 = (
+<ProblemDetail
+  markdown_text={variables5MD}
+  template_code={variables5Code}
+  game_ref={variables5Ref}
+  startScript='code.py'>
+  <Terminals ref={variables5Ref} />
 </ProblemDetail> );

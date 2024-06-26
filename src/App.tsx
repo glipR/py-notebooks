@@ -22,8 +22,9 @@ function App() {
       <ul>
         <li><a href={`/notebooks/variables/1`}>Variables 1 - Intro</a></li>
         <li><a href={`/notebooks/variables/2`}>Variables 2 - Challenge #1</a></li>
-        <li><a href={`/notebooks/variables/2`}>Variables 3 - Variables defining themselves?</a></li>
-        <li><a href={`/notebooks/variables/2`}>Variables 4 - Challenge #2</a></li>
+        <li><a href={`/notebooks/variables/3`}>Variables 3 - Challenge #2</a></li>
+        <li><a href={`/notebooks/variables/4`}>Variables 4 - Variables defining themselves?</a></li>
+        <li><a href={`/notebooks/variables/5`}>Variables 5 - Challenge #3</a></li>
       </ul>
     </div>
   );

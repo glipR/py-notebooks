@@ -19,7 +19,7 @@ import * as templates from './code_templates';
 import { PythonProvider } from 'react-py';
 import { intro1, intro2, intro3 } from './courses/python/01_Intro_Nums';
 import { strings1, strings2 } from './courses/python/02_Strings';
-import { variables1, variables2, variables3 } from './courses/python/03_Variables';
+import { variables1, variables2, variables3, variables4, variables5 } from './courses/python/03_Variables';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -91,6 +91,14 @@ const router = createBrowserRouter([
   {
     path: "/notebooks/variables/3",
     element: variables3,
+  },
+  {
+    path: "/notebooks/variables/4",
+    element: variables4,
+  },
+  {
+    path: "/notebooks/variables/5",
+    element: variables5,
   },
 ]);
 
