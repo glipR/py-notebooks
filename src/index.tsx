@@ -48,7 +48,12 @@ const router = createBrowserRouter([
         { x: 10, y: 10, width: 20, height: 20, color: '#ef476f' },
         { x: 70, y: 35, width: 60, height: 30, color: '#118ab2' },
         { x: 140, y: 20, width: 40, height: 60, color: '#06d6a0' },
-      ]} />
+      ]} walls={[
+        { x: 0, y: 0, width: 200, height: 5, color: '#000000' },
+        { x: 90, y: 0, width: 20, height: 25, color: '#000000' },
+        { x: 140, y: 25, width: 20, height: 50, color: '#000000' },
+      ]}
+      />
     </ProblemDetail>
     )
   },

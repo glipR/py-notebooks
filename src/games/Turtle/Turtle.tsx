@@ -109,7 +109,7 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
   constructor(props: TurtleProps) {
     super(props)
     this.state = {
-      turtleBearing: -90,
+      turtleBearing: 90,
       turtleX: props.areaWidth / 2,
       turtleY: props.areaHeight / 2,
       width: 10,
@@ -127,44 +127,98 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
     this.setState({ springConfig: { ...config.spring, duration } });
   }
 
+  tryMoveTurtle(newX: number, newY: number) {
+    const { turtleX, turtleY } = this.state;
+    const { walls } = this.props;
+    let curX = newX;
+    let curY = newY;
+    if (newX !== turtleX || newY !== turtleY) {
+      let grad = 0;
+      if (newX !== turtleX) {
+        grad = (newY - turtleY) / (newX - turtleX);
+      }
+      for (let wall of walls ?? []) {
+        if (curX === turtleX) {
+          if (wall.x <= turtleX && turtleX <= wall.x + wall.width) {
+            if (turtleY < wall.y && curY >= wall.y) {
+              curY = wall.y;
+            } else if (turtleY > wall.y + wall.height && curY <= wall.y + wall.height) {
+              curY = wall.y + wall.height;
+            }
+          }
+          continue;
+        }
+        if (curY === turtleY) {
+          if (wall.y <= turtleY && turtleY <= wall.y + wall.height) {
+            if (turtleX < wall.x && curX >= wall.x) {
+              curX = wall.x;
+            } else if (turtleX < wall.x + wall.width && curX >= wall.x + wall.width) {
+              curX = wall.x + wall.width;
+            }
+          }
+          continue;
+        }
+        // Now we can use grad.
+        for (let posx of [wall.x, wall.x + wall.width]) {
+          if ((turtleX < posx && curX >= posx) || (turtleX > posx && curX <= posx)){
+            let y = grad * (posx - turtleX) + turtleY;
+            if (wall.y <= y && y <= wall.y + wall.height) {
+              curX = posx;
+              curY = y;
+            }
+          }
+        }
+        for (let posy of [wall.y, wall.y + wall.height]) {
+          if ((turtleY < posy && curY >= posy) || (turtleY > posy && curY <= posy)) {
+            let x = 1 / grad * (posy - turtleY) + turtleX;
+            if (wall.x <= x && x <= wall.x + wall.width) {
+              curX = x;
+              curY = posy;
+            }
+          }
+        }
+      }
+    }
+    let dist = Math.sqrt((curX - turtleX) ** 2 + (curY - turtleY) ** 2);
+    this.setDuration(dist / MOVEMENT_SPEED);
+    this.setState({ turtleX: curX, turtleY: curY });
+  }
+
   ingestMessage(obj: any, sendInput: (x: string) => void):void {
     const { turtleBearing, turtleX, turtleY } = this.state;
     if (obj.type === 'forward') {
-      this.setDuration(obj.dist / MOVEMENT_SPEED);
       const dist = obj.dist;
-      this.setState({
-        turtleX: turtleX + dist * Math.cos(deg2rad(turtleBearing)),
-        turtleY: turtleY + dist * Math.sin(deg2rad(turtleBearing)),
-      });
+      this.tryMoveTurtle(
+        turtleX + dist * Math.cos(deg2rad(turtleBearing)),
+        turtleY - dist * Math.sin(deg2rad(turtleBearing)),
+      );
     } else if (obj.type === 'backward') {
-      this.setDuration(obj.dist / MOVEMENT_SPEED);
       const dist = obj.dist;
-      this.setState({
-        turtleX: turtleX - dist * Math.cos(deg2rad(turtleBearing)),
-        turtleY: turtleY - dist * Math.sin(deg2rad(turtleBearing)),
-      });
+      this.tryMoveTurtle(
+        turtleX - dist * Math.cos(deg2rad(turtleBearing)),
+        turtleY + dist * Math.sin(deg2rad(turtleBearing)),
+      );
     } else if (obj.type === "right") {
-      this.setDuration(obj.angle / ROTATION_SPEED);
       const angle = obj.angle;
-      this.setState({
-        turtleBearing: turtleBearing + angle,
-      });
-    }
-    else if (obj.type === "left") {
-      this.setDuration(obj.angle / ROTATION_SPEED);
-      const angle = obj.angle;
+      this.setDuration(Math.abs(angle) / ROTATION_SPEED);
       this.setState({
         turtleBearing: turtleBearing - angle,
       });
     }
+    else if (obj.type === "left") {
+      const angle = obj.angle;
+      this.setDuration(Math.abs(angle) / ROTATION_SPEED);
+      this.setState({
+        turtleBearing: turtleBearing + angle,
+      });
+    }
     else if (obj.type === "shift_move") {
-      this.setDuration(obj.dist / MOVEMENT_SPEED);
       const angle = obj.angle;
       const dist = obj.dist;
-      this.setState({
-        turtleX: turtleX + dist * Math.cos(- deg2rad(angle)),
-        turtleY: turtleY + dist * Math.sin(- deg2rad(angle)),
-      });
+      this.tryMoveTurtle(
+        turtleX + dist * Math.cos(deg2rad(angle)),
+        turtleY - dist * Math.sin(deg2rad(angle)),
+      );
     }
     else if (obj.type === "color_sense") {
       const { turtleX, turtleY } = this.state;
@@ -232,7 +286,7 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
             texture={PIXI.Texture.from('/turtle.svg')}
             x={props.turtleX.to((x) => x * actualWidth / areaWidth)}
             y={props.turtleY.to((y) => y * actualHeight / areaHeight)}
-            rotation={props.turtleBearing.to(deg => deg2rad(deg + 90))}
+            rotation={props.turtleBearing.to(deg => -deg2rad(deg - 90))}
             anchor={{ x: 0.5, y: 0.5 }}
             width={8 * actualWidth / areaWidth}
             height={8 * actualHeight / areaHeight}
