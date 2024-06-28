@@ -26,6 +26,10 @@ function App() {
         <li><a href={`/notebooks/variables/4`}>Variables 4 - Variables defining themselves?</a></li>
         <li><a href={`/notebooks/variables/5`}>Variables 5 - Challenge #3</a></li>
       </ul>
+      <h2>Calling Functions</h2>
+      <ul>
+        <li><a href={`/notebooks/functions/1`}>Functions 1 - Intro</a></li>
+      </ul>
     </div>
   );
 }

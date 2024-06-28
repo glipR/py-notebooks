@@ -101,6 +101,7 @@ interface TurtleProps {
   areaHeight: number;
   splotches?: ColorSplotch[];
   walls?: Wall[];
+  beginTransform?: { x?: number, y?: number, bearing?: number };
 }
 
 const hex2rgb = (hex: string) => {
@@ -113,9 +114,9 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
   constructor(props: TurtleProps) {
     super(props)
     this.state = {
-      turtleBearing: 90,
-      turtleX: props.areaWidth / 2,
-      turtleY: props.areaHeight / 2,
+      turtleBearing: 90 + (props.beginTransform?.bearing ?? 0),
+      turtleX: props.beginTransform?.x ?? props.areaWidth / 2,
+      turtleY: props.beginTransform?.y ?? props.areaHeight / 2,
       width: 10,
       height: 10,
       springConfig: {...config.spring},
