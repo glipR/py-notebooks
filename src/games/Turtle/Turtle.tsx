@@ -55,6 +55,10 @@ from utils.mocking import send_message, wait_for_message
 def read_color():
     send_message(type="color_sense")
     return wait_for_message("color_read")["color"]
+
+def read_distance():
+    send_message(type="distance_sense")
+    return wait_for_message("distance_read")["distance"]
 `
 
 const MOVEMENT_SPEED = 0.025;
@@ -127,9 +131,11 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
     this.setState({ springConfig: { ...config.spring, duration } });
   }
 
-  tryMoveTurtle(newX: number, newY: number) {
-    const { turtleX, turtleY } = this.state;
+  findWall(turtleX: number, turtleY: number, bearing: number) {
     const { walls } = this.props;
+    const WALL_DIST = 10000;
+    const newX = turtleX + WALL_DIST * Math.cos(deg2rad(bearing));
+    const newY = turtleY - WALL_DIST * Math.sin(deg2rad(bearing));
     let curX = newX;
     let curY = newY;
     if (newX !== turtleX || newY !== turtleY) {
@@ -179,25 +185,40 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
         }
       }
     }
-    let dist = Math.sqrt((curX - turtleX) ** 2 + (curY - turtleY) ** 2);
-    this.setDuration(dist / MOVEMENT_SPEED);
-    this.setState({ turtleX: curX, turtleY: curY });
+    return { x: curX, y: curY };
+  }
+
+  wallDist() {
+    const { turtleX, turtleY, turtleBearing } = this.state;
+    const { x, y } = this.findWall(turtleX, turtleY, turtleBearing);
+    const dist = Math.sqrt((x - turtleX) ** 2 + (y - turtleY) ** 2);
+    return dist;
+  }
+
+  tryMoveTurtle(dist: number, bearing: number) {
+    const { turtleX, turtleY } = this.state;
+    const newX = turtleX + dist * Math.cos(deg2rad(bearing));
+    const newY = turtleY - dist * Math.sin(deg2rad(bearing));
+    const { x, y } = this.findWall(turtleX, turtleY, bearing);
+    let moveDist = Math.sqrt((newX - turtleX) ** 2 + (newY - turtleY) ** 2);
+    let wallDist = Math.sqrt((x - turtleX) ** 2 + (y - turtleY) ** 2);
+    if (moveDist > wallDist) {
+      this.setDuration(wallDist / MOVEMENT_SPEED);
+      this.setState({ turtleX: x, turtleY: y });
+    } else {
+      this.setDuration(moveDist / MOVEMENT_SPEED);
+      this.setState({ turtleX: newX, turtleY: newY });
+    }
   }
 
   ingestMessage(obj: any, sendInput: (x: string) => void):void {
-    const { turtleBearing, turtleX, turtleY } = this.state;
+    const { turtleBearing } = this.state;
     if (obj.type === 'forward') {
       const dist = obj.dist;
-      this.tryMoveTurtle(
-        turtleX + dist * Math.cos(deg2rad(turtleBearing)),
-        turtleY - dist * Math.sin(deg2rad(turtleBearing)),
-      );
+      this.tryMoveTurtle(dist, turtleBearing);
     } else if (obj.type === 'backward') {
       const dist = obj.dist;
-      this.tryMoveTurtle(
-        turtleX - dist * Math.cos(deg2rad(turtleBearing)),
-        turtleY + dist * Math.sin(deg2rad(turtleBearing)),
-      );
+      this.tryMoveTurtle(dist, 180 + turtleBearing);
     } else if (obj.type === "right") {
       const angle = obj.angle;
       this.setDuration(Math.abs(angle) / ROTATION_SPEED);
@@ -215,10 +236,7 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
     else if (obj.type === "shift_move") {
       const angle = obj.angle;
       const dist = obj.dist;
-      this.tryMoveTurtle(
-        turtleX + dist * Math.cos(deg2rad(angle)),
-        turtleY - dist * Math.sin(deg2rad(angle)),
-      );
+      this.tryMoveTurtle(dist, angle);
     }
     else if (obj.type === "color_sense") {
       const { turtleX, turtleY } = this.state;
@@ -234,6 +252,10 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
       } else {
         sendInput?.(JSON.stringify({type: "color_read", color: [0, 0, 0]}));
       }
+    }
+    else if (obj.type === "distance_sense") {
+      const dist = this.wallDist();
+      sendInput?.(JSON.stringify({type: "distance_read", distance: dist}));
     }
     this.setState({ sendInput });
   }
