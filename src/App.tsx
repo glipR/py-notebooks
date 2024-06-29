@@ -29,6 +29,7 @@ function App() {
       <h2>Calling Functions</h2>
       <ul>
         <li><a href={`/notebooks/functions/1`}>Functions 1 - Intro</a></li>
+        <li><a href={`/notebooks/functions/2`}>Functions 2 - Return Values</a></li>
       </ul>
     </div>
   );

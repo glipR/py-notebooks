@@ -4,7 +4,7 @@ import ProblemDetail from "../../pages/ProblemDetail/ProblemDetail";
 import Turtles from "../../games/Turtle/Turtle";
 
 const functions1MD = `\
-# Calling Functions
+## Calling Functions
 
 While we've got the hang of basic data and variables, we can't really do much with that yet before we discuss how to have our code affect things *outside* of our code.
 
@@ -29,6 +29,8 @@ There are a few commands we'll use in these first few examples:
 :::note{.info}
 In order to use functions not from the Python standard library, we need to import them. This is done in the scaffold in the first two lines - We'll cover in more detail how to import custom python code in future - for now it will always be in the scaffold.
 :::
+
+## Challenge #1
 
 Let's start by just executing the template given. Next, try changing the code so that we navigate to the red square.
 `;
@@ -67,5 +69,64 @@ export const functions1 = (
     x: 30,
     y: 85,
     bearing: 0,
+  }} />
+</ProblemDetail> );
+
+const functions2MD = `\
+## Return values
+
+With just function calls, we can communicate with other bits of code.
+Functions can also produce a value, which you can then store in a variable.
+This allows the other bits of code to then communicate with our code.
+
+In our turtle example, the \`read_distance\` function returns closest distance to a wall as a number.
+
+## Challenge #2
+
+Use the \`read_distance\` function to move 10 units away from the wall, then turn left, move 10 units away from the wall, etc. Until you complete the maze provided.
+
+:::note{.hint}
+\`read_distance\` may need to be called multiple times (for example before every movement is made.)
+:::
+
+:::note{.info}
+Consider the following code: \`backward(read_distance())\`. This works because the arguments of a function get evaluated before the function code itself.
+
+TODO: Image
+:::
+`;
+const functions2Code = {
+  "code.py": makeCode(`\
+from turtle.movement import * # Import all movement options
+from turtle.sense import read_distance
+
+wall_dist = read_distance()
+print(wall_dist)
+`)
+}
+const functions2Ref = createRef<Turtles>();
+export const functions2 = (
+<ProblemDetail
+  markdown_text={functions2MD}
+  template_code={functions2Code}
+  game_ref={functions2Ref}
+  startScript='code.py'>
+  <Turtles ref={functions2Ref} areaHeight={100} areaWidth={200} splotches={[
+    {x: 25, y: 10, width: 10, height: 10, color: "#3333CC"},
+    {x: 180, y: 10, width: 10, height: 10, color: "#CC3333"},
+  ]} walls={[
+    {x: 0, y: 0, width: 200, height: 5, color: "#000000"},
+    {x: 0, y: 0, width: 5, height: 100, color: "#000000"},
+    {x: 0, y: 95, width: 200, height: 5, color: "#000000"},
+    {x: 195, y: 0, width: 5, height: 100, color: "#000000"},
+    {x: 40, y: 0, width: 20, height: 80, color: "#000000"},
+    {x: 90, y: 60, width: 20, height: 60, color: "#000000"},
+    {x: 40, y: 0, width: 120, height: 35, color: "#000000"},
+    {x: 90, y: 0, width: 20, height: 40, color: "#000000"},
+    {x: 140, y: 0, width: 20, height: 80, color: "#000000"},
+  ]} beginTransform={{
+    x: 30,
+    y: 15,
+    bearing: 180,
   }} />
 </ProblemDetail> );
