@@ -46,7 +46,7 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
     setPosition: codeDragBarSet,
   } = useResizable({
     axis: "y",
-    initial: startY ?? 600,
+    initial: startY ?? 450,
     min: 0
   });
   const {
