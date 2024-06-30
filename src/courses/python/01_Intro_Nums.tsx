@@ -76,7 +76,8 @@ export const intro1 = (
   template_code={intro1Code}
   game_ref={intro1Ref}
   startScript='code.py'
-  startX={735}>
+  startX={735}
+  nextLink="/notebooks/intro/2">
   <Terminals ref={intro1Ref} />
 </ProblemDetail> );
 
@@ -112,7 +113,8 @@ export const intro2 = (
   markdown_text={intro2MD}
   template_code={intro2Code}
   game_ref={intro2Ref}
-  startScript='code.py'>
+  startScript='code.py'
+  nextLink="/notebooks/intro/3">
   <Terminals ref={intro2Ref} />
 </ProblemDetail> );
 
@@ -157,6 +159,7 @@ export const intro3 = (
   markdown_text={intro3MD}
   template_code={intro3Code}
   game_ref={intro3Ref}
-  startScript='code.py'>
+  startScript='code.py'
+  nextLink="/notebooks/strings/1">
   <Terminals ref={intro3Ref} />
 </ProblemDetail> );

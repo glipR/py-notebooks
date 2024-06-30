@@ -218,3 +218,16 @@
   overflow-y: auto;
   max-height: 100px;
 }
+
+.nextLink {
+  float: right;
+  padding: 5px 20px;
+  background-color: #3d2da7;
+  color: #ffffff;
+  font-size: 20px;
+
+  a {
+    color: #ffffff;
+    text-decoration: none;
+  }
+}

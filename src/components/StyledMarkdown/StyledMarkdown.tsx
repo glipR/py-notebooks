@@ -49,6 +49,7 @@ interface StyledMarkdownProps {
 
 const StyledMarkdown: React.FC<StyledMarkdownProps> = ({ content }) => {
   return (
+    <div className={"markdown_container"}>
     <Markdown
       children={content}
       rehypePlugins={[
@@ -85,6 +86,7 @@ const StyledMarkdown: React.FC<StyledMarkdownProps> = ({ content }) => {
         }
       }}
     />
+    </div>
   );
 };
 

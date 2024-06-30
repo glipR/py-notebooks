@@ -36,7 +36,8 @@ export const strings1 = (
   template_code={strings1Code}
   game_ref={strings1Ref}
   startScript='code.py'
-  startX={420}>
+  startX={420}
+  nextLink="/notebooks/strings/2">
   <Terminals ref={strings1Ref} />
 </ProblemDetail> );
 
@@ -82,6 +83,7 @@ export const strings2 = (
   template_code={strings2Code}
   game_ref={strings2Ref}
   startScript='code.py'
-  startX={600}>
+  startX={600}
+  nextLink="/notebooks/variables/1">
   <Terminals ref={strings2Ref} />
 </ProblemDetail> );

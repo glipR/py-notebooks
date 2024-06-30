@@ -23,6 +23,7 @@ type Props = {
   game_ref: React.RefObject<GameWindow>;
   startX?: number;
   startY?: number;
+  nextLink?: string;
 };
 
 const extensions = [
@@ -30,7 +31,7 @@ const extensions = [
   keymap.of([indentWithTab]),
 ];
 
-const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children, game_ref, startScript, startX, startY }) => {
+const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children, game_ref, startScript, startX, startY, nextLink }) => {
   const {
     position: contentW,
     separatorProps: contentDragBarProps,
@@ -188,6 +189,9 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
         <>
         <div className={cn(styles.content, styles.grow)}>
           <StyledMarkdown content={markdown_text} />
+          {nextLink && <a href={nextLink}><div className={styles.nextLink}>
+            Next
+          </div></a>}
         </div>
         <div className={cn(styles.resizeBar, styles.resizeVertical)} {...debuggerDragBarProps}>
           {

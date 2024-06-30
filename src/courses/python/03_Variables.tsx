@@ -70,7 +70,8 @@ export const variables1 = (
   markdown_text={variables1MD}
   template_code={variables1Code}
   game_ref={variables1Ref}
-  startScript='code.py'>
+  startScript='code.py'
+  nextLink="/notebooks/variables/2">
   <Terminals ref={variables1Ref} />
 </ProblemDetail> );
 
@@ -117,7 +118,8 @@ export const variables2 = (
   markdown_text={variables2MD}
   template_code={variables2Code}
   game_ref={variables2Ref}
-  startScript='code.py'>
+  startScript='code.py'
+  nextLink="/notebooks/variables/3">
   <Terminals ref={variables2Ref} />
 </ProblemDetail> );
 
@@ -153,7 +155,8 @@ export const variables3 = (
   markdown_text={variables3MD}
   template_code={variables3Code}
   game_ref={variables3Ref}
-  startScript='code.py'>
+  startScript='code.py'
+  nextLink="/notebooks/variables/4">
   <Terminals ref={variables3Ref} />
 </ProblemDetail> );
 
@@ -215,7 +218,8 @@ export const variables4 = (
   markdown_text={variables4MD}
   template_code={variables4Code}
   game_ref={variables4Ref}
-  startScript='code.py'>
+  startScript='code.py'
+  nextLink="/notebooks/variables/5">
   <Terminals ref={variables4Ref} />
 </ProblemDetail> );
 
@@ -251,6 +255,7 @@ export const variables5 = (
   markdown_text={variables5MD}
   template_code={variables5Code}
   game_ref={variables5Ref}
-  startScript='code.py'>
+  startScript='code.py'
+  nextLink="/notebooks/functions/1">
   <Terminals ref={variables5Ref} />
 </ProblemDetail> );

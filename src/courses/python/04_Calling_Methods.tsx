@@ -52,7 +52,8 @@ export const functions1 = (
   markdown_text={functions1MD}
   template_code={functions1Code}
   game_ref={functions1Ref}
-  startScript='code.py'>
+  startScript='code.py'
+  nextLink="/notebooks/functions/2">
   <Turtles ref={functions1Ref} areaHeight={100} areaWidth={200} splotches={[
     {x: 25, y: 80, width: 10, height: 10, color: "#3333CC"},
     {x: 165, y: 10, width: 10, height: 10, color: "#CC3333"},
@@ -110,7 +111,8 @@ export const functions2 = (
   markdown_text={functions2MD}
   template_code={functions2Code}
   game_ref={functions2Ref}
-  startScript='code.py'>
+  startScript='code.py'
+  nextLink="/notebooks/conditions/1">
   <Turtles ref={functions2Ref} areaHeight={100} areaWidth={200} splotches={[
     {x: 25, y: 10, width: 10, height: 10, color: "#3333CC"},
     {x: 180, y: 10, width: 10, height: 10, color: "#CC3333"},

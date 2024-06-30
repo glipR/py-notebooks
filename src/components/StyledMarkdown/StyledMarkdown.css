@@ -30,3 +30,7 @@ p > code {
   color: #ffa500;
   background-color: #00000030;
 }
+
+.markdown_container {
+  min-height: calc(100vh - 80px);
+}
