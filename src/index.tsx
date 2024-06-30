@@ -21,6 +21,7 @@ import { intro1, intro2, intro3 } from './courses/python/01_Intro_Nums';
 import { strings1, strings2 } from './courses/python/02_Strings';
 import { variables1, variables2, variables3, variables4, variables5 } from './courses/python/03_Variables';
 import { functions1, functions2 } from './courses/python/04_Calling_Methods';
+import { cond1, cond2, cond3, cond4 } from './courses/python/05_Conditions';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -113,6 +114,22 @@ const router = createBrowserRouter([
   {
     path: "/notebooks/functions/2",
     element: functions2,
+  },
+  {
+    path: "/notebooks/conditions/1",
+    element: cond1,
+  },
+  {
+    path: "/notebooks/conditions/2",
+    element: cond2,
+  },
+  {
+    path: "/notebooks/conditions/3",
+    element: cond3,
+  },
+  {
+    path: "/notebooks/conditions/4",
+    element: cond4,
   },
 ]);
 

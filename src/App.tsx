@@ -31,6 +31,13 @@ function App() {
         <li><a href={`/notebooks/functions/1`}>Functions 1 - Intro</a></li>
         <li><a href={`/notebooks/functions/2`}>Functions 2 - Return Values</a></li>
       </ul>
+      <h2>Conditions</h2>
+      <ul>
+        <li><a href={`/notebooks/conditions/1`}>Conditions 1 - Intro</a></li>
+        <li><a href={`/notebooks/conditions/2`}>Conditions 2 - Connected Conditions</a></li>
+        <li><a href={`/notebooks/conditions/3`}>Conditions 3 - Extra If Tools</a></li>
+        <li><a href={`/notebooks/conditions/4`}>Conditions 4 - Challenge - Keys</a></li>
+      </ul>
     </div>
   );
 }
