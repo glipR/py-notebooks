@@ -34,7 +34,7 @@ function App() {
       <h2>Conditions</h2>
       <ul>
         <li><a href={`/notebooks/conditions/1`}>Conditions 1 - Intro</a></li>
-        <li><a href={`/notebooks/conditions/2`}>Conditions 2 - Connected Conditions</a></li>
+        <li><a href={`/notebooks/conditions/2`}>Conditions 2 - Combining Conditions</a></li>
         <li><a href={`/notebooks/conditions/3`}>Conditions 3 - Extra If Tools</a></li>
         <li><a href={`/notebooks/conditions/4`}>Conditions 4 - Challenge - Keys</a></li>
       </ul>

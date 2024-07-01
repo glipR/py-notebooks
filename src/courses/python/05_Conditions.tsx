@@ -102,11 +102,121 @@ export const cond1 = (
 </ProblemDetail> );
 
 const cond2MD = `\
-TODO: \`and\`, \`or\`, \`not\`
+## Combining Conditions
+
+The last example in the previous slide might've seemed a bit hard to write, for as simple as the English instructions are:
+
+> If the fuel temperature is between 15 and 20 degrees inclusive, and the astronaut's name is "Buzz", then liftoff can occur.
+
+We had to achieve this in code using a counter variable for the correct checks, and then compare this with 2.
+
+For the next few pages, we'll be looking at tools that make \`if\` statements easier to use and more like their English counterparts.
+
+Just like you can use \`+ - * /\` to combine numbers, you can use \`and\`, \`or\`, and \`not\` to combine/alter boolean values.
+
+### \`and\`
+
+The \`and\` keyword is used to combine two booleans, and only returns \`True\` if both booleans are true, just like you'd expect.
+
+~~~python
+True and False       # False
+1 == 1 and 2 == 2    # True
+0 == 1 and 0 < 1 < 1 # False
+
+"hello" == "hello" and "world" == "world" # True
+
+if 15 <= fuel_temp <= 20 and astronaut_name == "Buzz":
+    print("All checks complete, lifting off in 3, 2, 1... 💥")
+~~~
+
+### \`or\`
+
+The \`or\` keyword is used to combine two booleans, and returns \`True\` if *either* boolean is true.
+
+~~~python
+True or False       # True
+1 == 1 or 2 == 2    # True
+0 == 1 or 0 < 1 < 1 # False
+
+"hello" == "hello" or "world" == "world" # True
+~~~
+
+This might not completely line up with the English definition of 'or'. Take the second line for example; is it true that 1 equals 1 or 2 equals 2?
+Well, 1 equals 1 **and** 2 equals 2, but it doesn't really *feel* right to say *or*. It's like if you are asked to bring an umbrella or stay inside, and you stay inside with an umbrella.
+
+Often in English 'or' is used to mean 'exclusively one or the other', but in Python, we're completely happy if both conditions are satisfied.
+
+This is helpful when coding, because often you'll need one of two things to be true, but you don't mind if both end up being true.
+
+~~~python
+# In this example, having both be true is impossible
+if age < 18 or age > 65:
+    print("You get a discount!")
+
+# In this example, both could be true, but we only need one for a discount
+if age < 18 or is_student:
+    print("You get a discount!")
+~~~
+
+### \`not\`
+
+If we want to do something if a condition is *not* true, we could write it like this:
+
+~~~python
+if (1 == 2) == False:
+    print("1 is not 2")
+~~~
+
+However, this can be a bit hard to read - in general you should avoid ever writing Booleans in conditions explicitly. We can instead use the \`not\` keyword:
+
+* \`(not True)\`  is \`False\`
+* \`(not False)\` is \`True\`
+
+~~~python
+if not (1 == 2):
+    print("1 is not 2")
+~~~
+
+Using these tools, let's fix the code on the right for the following problem:
+
+You are managing a tournament of 3 players, and you need to determine the winner of the tournament.
+Each player is given a score, and the winner is the player with the highest score.
+
+First, if there's a clear winner, we'd like to print the winner's name.
+Next, if there's a tie between two players, we'd like to print "It's a tie!".
+Finally, if all 3 players have the same score, we'd like to print "Everyone's a winner!".
+
+:::note{.info}
+If you have many different expressions on a single line, you can use brackets \`()\` to make it easier to read, and also ensure the order of operations is correct.
+
+~~~python
+x or y and z   # This is ambiguous. What happens if x is True and y/z is False?
+x or (y and z) # This is clear - it should be true
+(x or y) and z # This is clear - it should be false
+~~~
+:::
 `;
 const cond2Code = {
   "code.py": makeCode(`\
-`)
+player1 = |70|
+player2 = |50|
+player3 = |85|
+
+# Checking each individual winner
+if |True|:
+    print("Player 1 wins!")
+if |True|:
+    print("Player 2 wins!")
+if |True|:
+    print("Player 3 wins!")
+
+# 2 player tie check
+if |True|:
+    print("It's a tie!")
+# 3 player tie check
+if |True|:
+    print("Everyone's a winner!")
+`, '|', true, true)
 }
 const cond2Ref = createRef<Terminals>();
 export const cond2 = (
