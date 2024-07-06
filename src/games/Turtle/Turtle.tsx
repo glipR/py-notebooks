@@ -52,9 +52,23 @@ def shift_down(dist):
 const sense_code = `\
 from utils.mocking import send_message, wait_for_message
 
-def read_color():
+def read_color_rgb():
     send_message(type="color_sense")
     return wait_for_message("color_read")["color"]
+
+def read_color():
+    cols = read_color_rgb()
+    if max(cols) < 20:
+        return "black"
+    elif max(cols) - min(cols) < 20 and min(cols) > 200:
+        return "white"
+    elif cols[0] > max(cols[1:]) + 50:
+        return "red"
+    elif cols[1] > max(cols[::2]) + 50:
+        return "green"
+    elif cols[2] > max(cols[:2]) + 50:
+        return "blue"
+    return "unknown"
 
 def read_distance():
     send_message(type="distance_sense")
@@ -78,30 +92,48 @@ interface TurtleState {
   height: number;
   springConfig: any;
   sendInput?: (x: string) => void;
+  customState?: any;
+
+  computedSplotches: ColorSplotch[];
+  computedWalls: Wall[];
+  computedButtons: Button[];
 }
 
-interface ColorSplotch {
+interface BoundingRect {
   x: number;
   y: number;
   width: number;
   height: number;
+}
+
+interface ColorSplotch extends BoundingRect {
   color: string;
 }
 
-interface Wall {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
+interface Wall extends BoundingRect {
   color: string;
+}
+
+interface Button extends BoundingRect {
+  repeatable: boolean;
+  onPress: (customState: any) => any;
+}
+
+interface Transform {
+  x?: number;
+  y?: number;
+  bearing?: number;
 }
 
 interface TurtleProps {
   areaWidth: number;
   areaHeight: number;
-  splotches?: ColorSplotch[];
-  walls?: Wall[];
-  beginTransform?: { x?: number, y?: number, bearing?: number };
+  // TODO: Allow these to be functions, so resets can use random generation.
+  splotches?: ColorSplotch[] | ((state: any) => ColorSplotch[]);
+  walls?: Wall[] | ((state: any) => Wall[]);
+  buttons?: Button[] | ((state: any) => Button[]);
+  beginTransform?: Transform | ((state: any) => Transform);
+  initialCustomState?: any;
 }
 
 const hex2rgb = (hex: string) => {
@@ -113,14 +145,28 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
 
   constructor(props: TurtleProps) {
     super(props)
+    const customState = typeof props.initialCustomState === 'function' ? props.initialCustomState() : props.initialCustomState;
+    const transform = typeof props.beginTransform === 'function' ? props.beginTransform(customState) : props.beginTransform;
+    const computedSplotches = (typeof props.splotches === 'function' ? props.splotches(customState) : props.splotches) || [];
+    const computedWalls = (typeof props.walls === 'function' ? props.walls(customState) : props.walls) || [];
+    const computedButtons = (typeof props.buttons === 'function' ? props.buttons(customState) : props.buttons) || [];
     this.state = {
-      turtleBearing: 90 + (props.beginTransform?.bearing ?? 0),
-      turtleX: props.beginTransform?.x ?? props.areaWidth / 2,
-      turtleY: props.beginTransform?.y ?? props.areaHeight / 2,
+      turtleBearing: 90 + (transform?.bearing ?? 0),
+      turtleX: transform?.x ?? props.areaWidth / 2,
+      turtleY: transform?.y ?? props.areaHeight / 2,
       width: 10,
       height: 10,
       springConfig: {...config.spring},
+      customState,
+      computedSplotches,
+      computedWalls,
+      computedButtons,
     };
+  }
+
+  reset() {
+    const { initialCustomState } = this.props;
+    this.setState(typeof initialCustomState === 'function' ? initialCustomState() : initialCustomState)
   }
 
   onRest(self: any) {
@@ -132,77 +178,100 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
     this.setState({ springConfig: { ...config.spring, duration } });
   }
 
-  findWall(turtleX: number, turtleY: number, bearing: number) {
-    const { walls } = this.props;
+  findObstruction(turtleX: number, turtleY: number, bearing: number, obstructions: BoundingRect[]) {
     const WALL_DIST = 10000;
     const newX = turtleX + WALL_DIST * Math.cos(deg2rad(bearing));
     const newY = turtleY - WALL_DIST * Math.sin(deg2rad(bearing));
     let curX = newX;
     let curY = newY;
+    let curObstruction: BoundingRect | null = null;
     if (newX !== turtleX || newY !== turtleY) {
       let grad = 0;
       if (newX !== turtleX) {
         grad = (newY - turtleY) / (newX - turtleX);
       }
-      for (let wall of walls ?? []) {
+      for (let obstruction of obstructions ?? []) {
         if (curX === turtleX) {
-          if (wall.x <= turtleX && turtleX <= wall.x + wall.width) {
-            if (turtleY < wall.y && curY >= wall.y) {
-              curY = wall.y;
-            } else if (turtleY > wall.y + wall.height && curY <= wall.y + wall.height) {
-              curY = wall.y + wall.height;
+          if (obstruction.x <= turtleX && turtleX <= obstruction.x + obstruction.width) {
+            if (turtleY < obstruction.y && curY >= obstruction.y) {
+              curY = obstruction.y;
+              curObstruction = obstruction;
+            } else if (turtleY > obstruction.y + obstruction.height && curY <= obstruction.y + obstruction.height) {
+              curY = obstruction.y + obstruction.height;
+              curObstruction = obstruction;
             }
           }
           continue;
         }
         if (curY === turtleY) {
-          if (wall.y <= turtleY && turtleY <= wall.y + wall.height) {
-            if (turtleX < wall.x && curX >= wall.x) {
-              curX = wall.x;
-            } else if (turtleX < wall.x + wall.width && curX >= wall.x + wall.width) {
-              curX = wall.x + wall.width;
+          if (obstruction.y <= turtleY && turtleY <= obstruction.y + obstruction.height) {
+            if (turtleX < obstruction.x && curX >= obstruction.x) {
+              curX = obstruction.x;
+              curObstruction = obstruction;
+            } else if (turtleX < obstruction.x + obstruction.width && curX >= obstruction.x + obstruction.width) {
+              curX = obstruction.x + obstruction.width;
+              curObstruction = obstruction;
             }
           }
           continue;
         }
         // Now we can use grad.
-        for (let posx of [wall.x, wall.x + wall.width]) {
+        for (let posx of [obstruction.x, obstruction.x + obstruction.width]) {
           if ((turtleX < posx && curX >= posx) || (turtleX > posx && curX <= posx)){
             let y = grad * (posx - turtleX) + turtleY;
-            if (wall.y <= y && y <= wall.y + wall.height) {
+            if (obstruction.y <= y && y <= obstruction.y + obstruction.height) {
               curX = posx;
               curY = y;
+              curObstruction = obstruction;
             }
           }
         }
-        for (let posy of [wall.y, wall.y + wall.height]) {
+        for (let posy of [obstruction.y, obstruction.y + obstruction.height]) {
           if ((turtleY < posy && curY >= posy) || (turtleY > posy && curY <= posy)) {
             let x = 1 / grad * (posy - turtleY) + turtleX;
-            if (wall.x <= x && x <= wall.x + wall.width) {
+            if (obstruction.x <= x && x <= obstruction.x + obstruction.width) {
               curX = x;
               curY = posy;
+              curObstruction = obstruction;
             }
           }
         }
       }
     }
-    return { x: curX, y: curY };
+    return { x: curX, y: curY, obstruction: curObstruction };
   }
 
   wallDist() {
-    const { turtleX, turtleY, turtleBearing } = this.state;
-    const { x, y } = this.findWall(turtleX, turtleY, turtleBearing);
+    const { turtleX, turtleY, turtleBearing, computedWalls } = this.state;
+    const { x, y } = this.findObstruction(turtleX, turtleY, turtleBearing, computedWalls);
     const dist = Math.sqrt((x - turtleX) ** 2 + (y - turtleY) ** 2);
     return dist;
   }
 
   tryMoveTurtle(dist: number, bearing: number) {
-    const { turtleX, turtleY } = this.state;
+    const { turtleX, turtleY, computedButtons, computedWalls } = this.state;
     const newX = turtleX + dist * Math.cos(deg2rad(bearing));
     const newY = turtleY - dist * Math.sin(deg2rad(bearing));
-    const { x, y } = this.findWall(turtleX, turtleY, bearing);
-    let moveDist = Math.sqrt((newX - turtleX) ** 2 + (newY - turtleY) ** 2);
-    let wallDist = Math.sqrt((x - turtleX) ** 2 + (y - turtleY) ** 2);
+    const { x, y } = this.findObstruction(turtleX, turtleY, bearing, computedWalls);
+    const moveDist = Math.sqrt((newX - turtleX) ** 2 + (newY - turtleY) ** 2);
+    const wallDist = Math.sqrt((x - turtleX) ** 2 + (y - turtleY) ** 2);
+    for (let button of computedButtons ?? [])  {
+      const { x: bX, y: bY, obstruction } = this.findObstruction(turtleX, turtleY, bearing, [button]);
+      const buttonDist = Math.sqrt((bX - turtleX) ** 2 + (bY - turtleY) ** 2);
+      if (obstruction !== null && buttonDist < moveDist && buttonDist < wallDist) {
+        const self = this;
+        const scopedButton = button;
+        setTimeout(() => {
+          self.setState((oldState: TurtleState) => {
+            const customState = scopedButton.onPress(oldState.customState);
+            return {
+              ...oldState,
+              customState
+            }
+          })
+        }, buttonDist / MOVEMENT_SPEED)
+      }
+    }
     if (moveDist > wallDist) {
       this.setDuration(wallDist / MOVEMENT_SPEED);
       this.setState({ turtleX: x, turtleY: y });
@@ -240,9 +309,8 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
       this.tryMoveTurtle(dist, angle);
     }
     else if (obj.type === "color_sense") {
-      const { turtleX, turtleY } = this.state;
-      const { splotches } = this.props;
-      const splotch = splotches?.find((splotch) => (
+      const { turtleX, turtleY, computedSplotches } = this.state;
+      const splotch = computedSplotches.find((splotch) => (
         turtleX >= splotch.x &&
         turtleX <= splotch.x + splotch.width &&
         turtleY >= splotch.y &&
@@ -274,14 +342,29 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
     };
   }
 
+  componentDidUpdate(prevProps: Readonly<TurtleProps>, prevState: Readonly<TurtleState>, snapshot?: any): void {
+    const newProps = this.props;
+    const newState = this.state;
+    if (prevState.customState !== newState.customState) {
+      console.log(newState.customState)
+      this.setState((s) => ({
+        ...s,
+        computedSplotches: (typeof newProps.splotches === 'function' ? newProps.splotches(newState.customState) : newProps.splotches) ?? [],
+        computedWalls: (typeof newProps.walls === 'function' ? newProps.walls(newState.customState) : newProps.walls) ?? [],
+        computedButtons: (typeof newProps.buttons === 'function' ? newProps.buttons(newState.customState) : newProps.buttons) ?? [],
+      }))
+    }
+  }
+
   render() {
-    const { width, height, turtleBearing, turtleX, turtleY, springConfig } = this.state;
+    const { width, height, turtleBearing, turtleX, turtleY, springConfig, computedSplotches, computedWalls } = this.state;
     const { areaWidth, areaHeight } = this.props;
     const actualHeight = Math.min(height, width / PREFERRED_SCALE);
     const actualWidth = Math.min(width, height * PREFERRED_SCALE);
+
     return (
       <Stage options={config.stage} height={actualHeight} width={actualWidth}>
-          {this.props.splotches?.map((splotch, i) => (
+          {computedSplotches.map((splotch, i) => (
             <Sprite
               key={`splotch-${i}`}
               texture={PIXI.Texture.WHITE}
@@ -292,7 +375,7 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
               tint={splotch.color}
             />
           ))}
-          {this.props.walls?.map((wall, i) => (
+          {computedWalls.map((wall, i) => (
             <Sprite
               key={`wall-${i}`}
               texture={PIXI.Texture.WHITE}

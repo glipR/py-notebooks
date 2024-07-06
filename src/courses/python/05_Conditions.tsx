@@ -2,6 +2,7 @@ import { createRef } from "react";
 import { makeCode } from "../../components/MultiFileEditor/MultiFileEditor";
 import Terminals from "../../games/Terminal/Terminal";
 import ProblemDetail from "../../pages/ProblemDetail/ProblemDetail";
+import Turtles from "../../games/Turtle/Turtle";
 
 const cond1MD = `\
 ## Conditions
@@ -230,10 +231,98 @@ export const cond2 = (
 </ProblemDetail> );
 
 const cond3MD = `\
-TODO: \`else\` and \`elif\`
+## What Else?
+
+So far everything we've looked at is only following a single "branch" of decisions (are we ready to takeoff? who won the tournament?)
+
+But in many examples, we want to do something when a condition is true, *and* something else when the condition is false.
+
+In python, we *could* do
+
+~~~python
+if test:
+    print("Yes")
+if not test:
+    print("No")
+~~~
+
+But in a recipe, you don't really see this, instead you'll see:
+
+* If you're cooking the 12 servings version of this recipe, use 500g
+* **Otherwise**, use 250g
+
+In Python, we can do the same with the \`else\` keyword:
+
+~~~python
+if x < 15:
+    print("<15")
+else:
+    print(">=15")
+~~~
+
+The code within the \`else\` block will only get run if the previous \`if\` block result was \`False\`.
+This \`else\` needs to come *directly* after the \`if\`, so something like this, with unindented code inbetween, would not work:
+
+~~~python
+if x < 15:
+    print("<15")
+print("test")
+else:
+    print(">=15")
+~~~
+
+## If This, If That...
+
+Another tool in our arsenal is *nesting* - because any code can go within the indented if block, we can add further indents to branch into more than 2 outcomes:
+
+~~~python
+if age < 18:
+    print("Underage, you get cheaper tickets!")
+else:
+    print("Adult")
+    if is_student:
+        print("Adult Student, you get cheaper tickets!")
+    else:
+        print("Adult Non-Student, full price ticket please.")
+~~~
+
+This avoids having to recheck \`age >= 18\` for the two outcomes which are double indented.
+
+## Challenge #1
+
+With these new tools, let's work on some code to display the expected ticket price for an entrant.
+
+The logic for ticket prices are as follows:
+
+* Ages 5 and under are free ($0 ticket price)
+* Ages between 6 and 14 have a ticket price of $10
+* Ages between 15 and 18 have a ticket price of $18
+* Ages between 19 and 59 have a ticket price of $25
+* Ages 60 and up have a ticket price of $15
+
+However for certain age ranges, being a student reduces the price of a ticket:
+
+* Students between the ages of 15 and 18 only pay $13
+* Students between the ages of 19 and 59 only pay $20
+
+To make sure you're using the tools from this notebook, you need to solve this problem two ways:
+
+* Once, without using the keywords \`and\`, \`or\` or \`not\`
+* Once, while only using the keywords \`if\`, \`elif\`, \`else\` 7 times.
+
+
+TODO: Make a counter for this stuff in the editor
+TODO: This would benefit from showing different solutions in the slide after, I think.
 `;
 const cond3Code = {
   "code.py": makeCode(`\
+age = 26
+is_student = False
+# Code goes here :)
+# Set ticket_price within some conditionals.
+
+
+print("You'll have to pay", ticket_price)
 `)
 }
 const cond3Ref = createRef<Terminals>();
@@ -249,17 +338,137 @@ export const cond3 = (
 
 const cond4MD = `\
 TODO: Challenge utilising more complex stuff all together.
+## Challenge #2
+
+Now that we've learnt a bunch more, let's use our turtle to crack into a vault!
+
+The vault is blocked by a key, which fortunately our turtle is small enough to fit into.
+The vault only opens when the correct buttons are pushed in the mechanism, can you help us?
 `;
+
+/* Solution:
+from turtle.movement import *
+from turtle.sense import read_color
+
+col = read_color()
+extra = 0
+if col == "red":
+  extra = 20
+elif col == "green":
+  extra = 30
+elif col == "blue":
+  extra = 40
+forward(17.5 + extra)
+
+left(90)
+forward(12.5)
+backward(12.5)
+left(90)
+forward(extra)
+right(90)
+forward(50)
+left(90)
+forward(17.5)
+right(180)
+
+# Repeat 3 more times
+*/
 const cond4Code = {
   "code.py": makeCode(`\
+from turtle.movement import *
+shift_right(12.5)
+forward(70)
 `)
 }
-const cond4Ref = createRef<Terminals>();
+const cond4Ref = createRef<Turtles>();
 export const cond4 = (
 <ProblemDetail
   markdown_text={cond4MD}
   template_code={cond4Code}
   game_ref={cond4Ref}
   startScript='code.py'>
-  <Terminals ref={cond4Ref} />
+  <Turtles areaHeight={100} areaWidth={200} ref={cond4Ref}
+    splotches={(state: any) => [
+      {x: 30, width: 5, y: 60, height: 5, color: "#ff0000"},
+      {x: 30, width: 5, y: 70, height: 5, color: "#00ff00"},
+      {x: 30, width: 5, y: 80, height: 5, color: "#0000ff"},
+      {x: 80, width: 5, y: 60, height: 5, color: "#ff0000"},
+      {x: 80, width: 5, y: 70, height: 5, color: "#00ff00"},
+      {x: 80, width: 5, y: 80, height: 5, color: "#0000ff"},
+      {x: 130, width: 5, y: 60, height: 5, color: "#ff0000"},
+      {x: 130, width: 5, y: 70, height: 5, color: "#00ff00"},
+      {x: 130, width: 5, y: 80, height: 5, color: "#0000ff"},
+      {x: 180, width: 5, y: 60, height: 5, color: "#ff0000"},
+      {x: 180, width: 5, y: 70, height: 5, color: "#00ff00"},
+      {x: 180, width: 5, y: 80, height: 5, color: "#0000ff"},
+
+      {x: 15, width: 10, y: 20, height: 10, color: state.colors[state.keys[0]]},
+      {x: 65, width: 10, y: 20, height: 10, color: state.colors[state.keys[1]]},
+      {x: 115, width: 10, y: 20, height: 10, color: state.colors[state.keys[2]]},
+      {x: 165, width: 10, y: 20, height: 10, color: state.colors[state.keys[3]]},
+    ]}
+    buttons={(staleState: any) => {
+
+      const buttons = [];
+      for (let x = 0; x < 4; x ++) {
+        for (let y = 0; y < 3; y ++) {
+          buttons.push({
+            x: 30 + 50 * x,
+            width: 5,
+            y: 60 + 10 * y,
+            height: 5,
+            repeatable: false,
+            onPress: (newState: any)=>{
+              const newActivated = [...newState.activated];
+              let newDead = newState.dead;
+              if (newState.keys[x] === y) {
+                newActivated[x] = true;
+              } else {
+                newDead = true;
+              }
+              return {...newState, dead: newDead, activated: newActivated}
+            }
+          })
+        }
+      }
+      return buttons;
+    }}
+    initialCustomState={() => {
+      const keys: Array<number> = [];
+      const colors = ["#ff0000", "#00ff00", "#0000ff"]
+      const length = 4;
+      for (let x=0; x<length; x++) {
+        keys.push(Math.floor(Math.random() * colors.length));
+      }
+      const activated = Array.from({length: length}, () => false);
+
+      return {
+        dead: false,
+        colors,
+        keys,
+        activated,
+      }
+    }}
+    walls={(state: any) => {
+      const walls = [
+        {x: 45, width: 5, y: 50, height: 60, color: "#000000"},
+        {x: 45, width: 5, y: 0, height: 30, color: "#000000"},
+        {x: 95, width: 5, y: 50, height: 60, color: "#000000"},
+        {x: 95, width: 5, y: 0, height: 30, color: "#000000"},
+        {x: 145, width: 5, y: 50, height: 60, color: "#000000"},
+        {x: 145, width: 5, y: 0, height: 30, color: "#000000"},
+      ]
+      if ((state.activated.filter((x: boolean) => !x).length !== 0) || state.dead) {
+        walls.push({
+          x: 190, width: 10, y: 0, height: 120, color: "#444444"
+        })
+      }
+      return walls;
+    }}
+    beginTransform={{
+      x: 20,
+      y: 25,
+      bearing: 180,
+    }}
+  />
 </ProblemDetail> );
