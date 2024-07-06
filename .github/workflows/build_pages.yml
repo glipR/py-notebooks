@@ -23,7 +23,7 @@ jobs:
       - run: mv build docs
       - uses: EndBug/add-and-commit@v9
         with:
-          add: 'build'
+          add: 'docs'
           fetch: false
           message: 'Build static site'
           new_branch: github-pages
