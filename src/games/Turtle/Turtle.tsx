@@ -115,7 +115,6 @@ interface Wall extends BoundingRect {
 }
 
 interface Button extends BoundingRect {
-  repeatable: boolean;
   onPress: (customState: any) => any;
 }
 
