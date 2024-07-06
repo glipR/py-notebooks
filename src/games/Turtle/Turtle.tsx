@@ -163,9 +163,17 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
     };
   }
 
-  reset() {
-    const { initialCustomState } = this.props;
-    this.setState(typeof initialCustomState === 'function' ? initialCustomState() : initialCustomState)
+  resetWindow(self: any) {
+    const { initialCustomState, beginTransform, areaWidth, areaHeight } = self.props;
+    const customState = typeof initialCustomState === 'function' ? initialCustomState() : initialCustomState;
+    const transform = typeof beginTransform === 'function' ? beginTransform(customState) : beginTransform;
+    this.setState((prevState: TurtleState) =>({
+      ...prevState,
+      turtleBearing: 90 + (transform?.bearing ?? 0),
+      turtleX: transform?.x ?? areaWidth / 2,
+      turtleY: transform?.y ?? areaHeight / 2,
+      customState,
+    }))
   }
 
   onRest(self: any) {

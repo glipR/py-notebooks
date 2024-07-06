@@ -298,14 +298,17 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
             />
             </>
           }
+        </div>
+        <div className={cn(styles.grow, styles.flexContainer)}>
+          <div className={cn('game', styles.grow)}>
+          {children}
+          </div>
           {stdout && !game_ref.current?.terminalDisabled && <div className={styles.terminal}>
             <code>
             {stdout}
             </code>
           </div>}
-        </div>
-        <div className={cn('game', styles.grow)}>
-        {children}
+          {game_ref.current?.resetWindow && <button className={styles.resetButton} onClick={() => game_ref.current?.resetWindow?.(game_ref.current)}>R</button>}
         </div>
       </div>
     </div>

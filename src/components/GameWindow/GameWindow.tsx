@@ -5,5 +5,6 @@ export default interface GameWindow {
   setDimensions?(width: number, height: number): void;
   getPythonPreamble?(): TreeStructure;
   setStdout?(stdout: string): void;
+  resetWindow?(self: any): void;
   terminalDisabled?: boolean;
 }
