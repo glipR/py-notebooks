@@ -1,0 +1,25 @@
+name: Node.js CI
+
+on: [push]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.x'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run build
+      - uses: EndBug/add-and-commit@v9
+        with:
+          add: 'build'
+          fetch: false
+          message: 'Build static site'
+          new_branch: github-pages
+          push: 'origin github-pages --force'
