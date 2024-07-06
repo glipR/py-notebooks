@@ -131,7 +131,7 @@ const router = createBrowserRouter([
     path: "/notebooks/conditions/4",
     element: cond4,
   },
-]);
+], {basename: process.env.NODE_ENV === 'development' ? '' : '/py-notebooks'});
 
 root.render(
   <React.StrictMode>
