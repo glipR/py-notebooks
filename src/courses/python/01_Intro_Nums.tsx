@@ -9,10 +9,10 @@ const intro1MD = `\
 Congratulations on starting your journey in Python.
 It takes a lot of effort to start something new, and learning to program is a fun process that leaves you with a very powerful tool in the palm of your hands!
 
-A bit of a disclaimer this notebook, and learning programming in general - you aren't going to be making the most amazing things from day 1.
+A bit of a disclaimer with this notebook, and learning programming in general - you aren't going to be making the most amazing things from day 1.
 Programming Languages are just that - a language, and so the first few steps are pretty much always going to be learning the basics, and practicing those.
 
-Let's first ourselves, what **are** the basics of a programming language, or maybe even more abstract - what is a programming language?
+Let's first ask ourselves, what **are** the basics of a programming language, or maybe even more abstract - what is a programming language?
 
 At it's heart, programs and all their tools are all about **data**. A program takes some data, then transforms it into some other data that we want.
 
@@ -36,10 +36,10 @@ Numbers in python come in two main flavours:
 * Integers (Fancy term for whole numbers, positive, negative and zero). Examples: \`4\`, \`-2\`, \`0\`
 * Floating Point (Technical term for decimals, we'll explore it later). Examples: \`3.2\`, \`0.5\`, \`-12.8\`
 
-How I've written then above is exactly how you write them in python code. Simple right? You can also *transform* this data using the symbols you normally see in math:
-* \`+\`: Adds numbers together (plus, Written with Shift + \`=\`)
+How I've written them above is exactly how you write them in python code. Simple right? You can also *transform* this data using the symbols you normally see in math:
+* \`+\`: Adds numbers together (plus, Written with Shift and \`=\`)
 * \`-\`: Subtracts one number from another (minus, This is the dash key on your keyboard)
-* \`*\`: Multiplies two numbers (times, Written with Shift + \`8\`)
+* \`*\`: Multiplies two numbers (times, Written with Shift and \`8\`)
 * \`/\`: Divides two numbers (This is the forward slash key on your keyboard)
 
 One final tool you'll have to trust me about for now is the \`print\` function. When you write \`print( )\`, any data in-between the brackets will be shown in the terminal window below.

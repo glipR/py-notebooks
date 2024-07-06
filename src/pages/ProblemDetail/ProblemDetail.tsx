@@ -14,6 +14,7 @@ import styles from './ProblemDetail.module.css';
 import * as constants from './constants';
 import GameWindow from '../../components/GameWindow/GameWindow';
 import MultiFileEditor, { CodeBlock, TreeStructure, getCodeFromFolder, makeCode } from '../../components/MultiFileEditor/MultiFileEditor';
+import { Link } from 'react-router-dom';
 
 type Props = {
   markdown_text: string;
@@ -189,9 +190,9 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
         <>
         <div className={cn(styles.content, styles.grow)}>
           <StyledMarkdown content={markdown_text} />
-          {nextLink && <a href={nextLink}><div className={styles.nextLink}>
+          {nextLink && <Link to={nextLink}><div className={styles.nextLink}>
             Next
-          </div></a>}
+          </div></Link>}
         </div>
         <div className={cn(styles.resizeBar, styles.resizeVertical)} {...debuggerDragBarProps}>
           {
