@@ -458,7 +458,7 @@ export const cond4 = (
             width: 5,
             y: 60 + 10 * y,
             height: 5,
-            onPress: (newState: any)=>{
+            onPress: (newState: any) => {
               const newActivated = [...newState.activated];
               let newDead = newState.dead;
               if (newState.keys[x] === y) {
