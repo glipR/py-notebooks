@@ -16,6 +16,8 @@ jobs:
           cache: 'npm'
       - run: npm ci
       - run: npm run build
+      # Ensure the build directory is not ignored
+      - run: sed -i 's/\/build/# \/build/' '.gitignore'
       - uses: EndBug/add-and-commit@v9
         with:
           add: 'build'
