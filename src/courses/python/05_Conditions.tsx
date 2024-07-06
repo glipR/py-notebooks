@@ -308,7 +308,7 @@ However for certain age ranges, being a student reduces the price of a ticket:
 To make sure you're using the tools from this notebook, you need to solve this problem two ways:
 
 * Once, without using the keywords \`and\`, \`or\` or \`not\`
-* Once, while only using the keywords \`if\`, \`elif\`, \`else\` 7 times.
+* Once, while only using the keywords \`if\` and \`else\` 7 times each.
 
 
 TODO: Make a counter for this stuff in the editor
@@ -337,7 +337,43 @@ export const cond3 = (
 </ProblemDetail> );
 
 const cond4MD = `\
-TODO: Challenge utilising more complex stuff all together.
+## Elif
+
+While nesting is useful, as you might have seen in the previous challenge, it can go overboard when all you want to do is check a few different conditions:
+
+~~~python
+if age < 18:
+    print(1)
+else:
+    if age < 25:
+        print(2)
+    else:
+        if age < 40:
+            print(3)
+        else:
+            print(4)
+            # ...
+~~~
+
+And this pattern, where we want to do something if condition 1 is true, then something if condition 1 is false, but condition 2 is true, and so on, is so common that Python has a keyword for it: \`elif\`.
+
+This is a shortening of \`else\`, followed by \`if\`. And if you look at the code above, squishing together each \`else\` with the following \`if\` gives us this code:
+
+~~~python
+if age < 18:
+    print(1)
+elif age < 25: # Originally else: (new line) if age < 25:
+    print(2)
+elif age < 40: # Originally else: (new line) if age < 40:
+    print(3)
+else:
+    print(4)
+    # ...
+~~~
+
+Notice this is different from just using replacing \`elif\` with \`if\` - the code would print 1, 2 and 3 if \`age = 12\`.
+Also, our \`else\` block is still there, and will only run if *all* the previous conditions are false.
+
 ## Challenge #2
 
 Now that we've learnt a bunch more, let's use our turtle to crack into a vault!
@@ -389,23 +425,28 @@ export const cond4 = (
   startScript='code.py'>
   <Turtles areaHeight={100} areaWidth={200} ref={cond4Ref}
     splotches={(state: any) => [
-      {x: 30, width: 5, y: 60, height: 5, color: "#ff0000"},
-      {x: 30, width: 5, y: 70, height: 5, color: "#00ff00"},
-      {x: 30, width: 5, y: 80, height: 5, color: "#0000ff"},
-      {x: 80, width: 5, y: 60, height: 5, color: "#ff0000"},
-      {x: 80, width: 5, y: 70, height: 5, color: "#00ff00"},
-      {x: 80, width: 5, y: 80, height: 5, color: "#0000ff"},
-      {x: 130, width: 5, y: 60, height: 5, color: "#ff0000"},
-      {x: 130, width: 5, y: 70, height: 5, color: "#00ff00"},
-      {x: 130, width: 5, y: 80, height: 5, color: "#0000ff"},
-      {x: 180, width: 5, y: 60, height: 5, color: "#ff0000"},
-      {x: 180, width: 5, y: 70, height: 5, color: "#00ff00"},
-      {x: 180, width: 5, y: 80, height: 5, color: "#0000ff"},
+      {x: 32.5, width: 5, y: 62.5, height: 5, color: "#ff0000"},
+      {x: 32.5, width: 5, y: 72.5, height: 5, color: "#00ff00"},
+      {x: 32.5, width: 5, y: 82.5, height: 5, color: "#0000ff"},
+      {x: 82.5, width: 5, y: 62.5, height: 5, color: "#ff0000"},
+      {x: 82.5, width: 5, y: 72.5, height: 5, color: "#00ff00"},
+      {x: 82.5, width: 5, y: 82.5, height: 5, color: "#0000ff"},
+      {x: 132.5, width: 5, y: 62.5, height: 5, color: "#ff0000"},
+      {x: 132.5, width: 5, y: 72.5, height: 5, color: "#00ff00"},
+      {x: 132.5, width: 5, y: 82.5, height: 5, color: "#0000ff"},
+      {x: 182.5, width: 5, y: 62.5, height: 5, color: "#ff0000"},
+      {x: 182.5, width: 5, y: 72.5, height: 5, color: "#00ff00"},
+      {x: 182.5, width: 5, y: 82.5, height: 5, color: "#0000ff"},
 
-      {x: 15, width: 10, y: 20, height: 10, color: state.colors[state.keys[0]]},
-      {x: 65, width: 10, y: 20, height: 10, color: state.colors[state.keys[1]]},
-      {x: 115, width: 10, y: 20, height: 10, color: state.colors[state.keys[2]]},
-      {x: 165, width: 10, y: 20, height: 10, color: state.colors[state.keys[3]]},
+      {x: 10, width: 10, y: 20, height: 10, color: state.colors[state.keys[0]]},
+      {x: 60, width: 10, y: 20, height: 10, color: state.colors[state.keys[1]]},
+      {x: 110, width: 10, y: 20, height: 10, color: state.colors[state.keys[2]]},
+      {x: 160, width: 10, y: 20, height: 10, color: state.colors[state.keys[3]]},
+
+      {x: 12.5, width: 5, y: 2.5, height: 5, color: state.dead ? "#ff0000" : (state.activated[0] ? "#00ff00" : "#666666")},
+      {x: 62.5, width: 5, y: 2.5, height: 5, color: state.dead ? "#ff0000" : (state.activated[1] ? "#00ff00" : "#666666")},
+      {x: 112.5, width: 5, y: 2.5, height: 5, color: state.dead ? "#ff0000" : (state.activated[2] ? "#00ff00" : "#666666")},
+      {x: 162.5, width: 5, y: 2.5, height: 5, color: state.dead ? "#ff0000" : (state.activated[3] ? "#00ff00" : "#666666")},
     ]}
     buttons={(staleState: any) => {
 
@@ -417,7 +458,6 @@ export const cond4 = (
             width: 5,
             y: 60 + 10 * y,
             height: 5,
-            repeatable: false,
             onPress: (newState: any)=>{
               const newActivated = [...newState.activated];
               let newDead = newState.dead;
@@ -451,12 +491,13 @@ export const cond4 = (
     }}
     walls={(state: any) => {
       const walls = [
+        {x: 0, width: 200, y: 10, height: 5, color: "#000000"},
         {x: 45, width: 5, y: 50, height: 60, color: "#000000"},
-        {x: 45, width: 5, y: 0, height: 30, color: "#000000"},
+        {x: 45, width: 5, y: 10, height: 20, color: "#000000"},
         {x: 95, width: 5, y: 50, height: 60, color: "#000000"},
-        {x: 95, width: 5, y: 0, height: 30, color: "#000000"},
+        {x: 95, width: 5, y: 10, height: 20, color: "#000000"},
         {x: 145, width: 5, y: 50, height: 60, color: "#000000"},
-        {x: 145, width: 5, y: 0, height: 30, color: "#000000"},
+        {x: 145, width: 5, y: 10, height: 20, color: "#000000"},
       ]
       if ((state.activated.filter((x: boolean) => !x).length !== 0) || state.dead) {
         walls.push({
@@ -466,7 +507,7 @@ export const cond4 = (
       return walls;
     }}
     beginTransform={{
-      x: 20,
+      x: 15,
       y: 25,
       bearing: 180,
     }}
