@@ -76,5 +76,6 @@
     "@types/react-syntax-highlighter": "^15.5.13",
     "hastscript": "^9.0.0",
     "remark-directive": "^3.0.0"
-  }
+  },
+  "homepage": "http://glipr.github.io/py-notebooks"
 }
