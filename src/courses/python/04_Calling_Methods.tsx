@@ -8,7 +8,9 @@ const functions1MD = `\
 
 While we've got the hang of basic data and variables, we can't really do much with that yet before we discuss how to have our code affect things *outside* of our code.
 
-This is achieve in Python by calling *functions*. We won't cover how to write our own functions for a while, but we can think of functions like little snippets of code that we can execute, **but** we can specify the values of certain variables in our code instead.
+This is achieved in Python by calling *functions*. We won't cover how to write our own functions for a while,
+but we can think of functions like little snippets of code that we can execute,
+**but** we can specify the values of certain variables in our code before execution.
 
 We've already gotten quite familiar with one function, the \`print\` function!
 
@@ -20,14 +22,13 @@ Using functions lets us start writing code that affects other parts of the edito
 In the bottom right of the editor, you'll see a little turtle. Using code and functions, we can move, rotate and collect information from this turtle!
 There are a few commands we'll use in these first few examples:
 
-* \`forward(distance)\` - Moves the turtle forward by a certain distance (The window is 200 units wide and 100 units tall)
-* \`backward(distance)\` - Moves the turtle backward by a certain distance
-* \`right(angle)\` - Rotates the turtle right by a certain angle in degrees (90 is a quarter turn)
-* \`left(angle)\` - Rotates the turtle left by a certain angle in degrees (90 is a quarter turn)
-* \`read_distance()\` - Returns the distance from the turtle to the nearest wall
+* \`forward(distance)\` - Takes one argument - distance. Moves the turtle forward by a certain distance (The window is 200 units wide and 100 units tall)
+* \`backward(distance)\` - Takes one argument - distance. Moves the turtle backward by a certain distance
+* \`right(angle)\` - Takes one argument - angle. Rotates the turtle right by a certain angle in degrees (90 is a quarter turn)
+* \`left(angle)\` - Takes one argument - angle. Rotates the turtle left by a certain angle in degrees (90 is a quarter turn)
 
 :::note{.info}
-In order to use functions not from the Python standard library, we need to import them. This is done in the scaffold in the first two lines - We'll cover in more detail how to import custom python code in future - for now it will always be in the scaffold.
+In order to use functions not from the Python standard library, we need to import them. This is done in the scaffold in the first line - We'll cover in more detail how to import custom python code in future - for now it will always be in the scaffold.
 :::
 
 ## Challenge #1
@@ -80,7 +81,7 @@ With just function calls, we can communicate with other bits of code.
 Functions can also produce a value, which you can then store in a variable.
 This allows the other bits of code to then communicate with our code.
 
-In our turtle example, the \`read_distance\` function returns closest distance to a wall as a number.
+In our turtle example, the \`read_distance\` function takes no arguments and returns the distance to a wall as a number (in the direction the turtle is facing).
 
 ## Challenge #2
 

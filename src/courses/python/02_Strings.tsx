@@ -48,7 +48,7 @@ Strings aren't too complicated once you're comfortable with adding text together
 
 One other trick - you can put multiple bits of data inside \`print( )\`, separated by commas, and it will print the bits of data separated by a space!
 
-Using the code on the right, print the following essay:
+Using the code on the right, print the following transcript:
 
 ~~~
 A: Hey, want to hear a joke about "<topic>"?

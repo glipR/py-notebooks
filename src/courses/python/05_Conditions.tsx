@@ -34,7 +34,7 @@ if oven_type == "fan_forced":
     oven_time = oven_time - 10
 ~~~
 
-Let's disect the structure here:
+Let's dissect the structure here:
 
 * We start with the \`if\` keyword, followed by a space
 * Next, we have an expression (\`oven_type == "fan_forced"\`). We'll cover how we can make more comparisons later.
@@ -62,6 +62,8 @@ We can use many different comparisons between numbers and strings. These are the
 * \`str1 == str2\`: Returns \`True\` if the strings of text are **exactly** the same. They are the same length, the first character is exactly the same, the second is, ...
 * \`num1 <= num2 < num3\`: Returns \`True\` only if num2 is greater than or equal to num1, and num2 is less than num3. You can add/remove the \`=\` from each side to allow/disallow 'equal to' as an option.
 
+## Challenge
+
 Comment out Example 1 on the right and Un-Comment Example 2. Fix the bug in the code so that liftoff can only occur if the fuel temp is between 15 and 20 degrees inclusive *and* the astronaut's name is "Buzz"
 `;
 const cond1Code = {
@@ -84,7 +86,7 @@ print(x)
 # if astronaut_name == "Buzz":
 #     print("Shouldn't Buzz be commanding this shuttle? Not", astronaut_name)
 # if astronaut_name != "Buzz":
-#     print("Commander", astronaut, "ready for liftoff")
+#     print("Commander", astronaut_name, "ready for liftoff")
 #     correct_checks = correct_checks + 1
 #
 # if correct_checks > 2:

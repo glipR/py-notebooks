@@ -15,6 +15,7 @@ interface MultiFileEditorProps {
   tree: TreeStructure
   onChange?: (tree: TreeStructure) => void;
   height: string;
+  width: string;
   theme: Extension;
   extensions: Extension[];
   defaultFile?: string;
@@ -235,7 +236,7 @@ export const getCodeFromFolder = (totalTree: TreeStructure, folderPath: string) 
   }
 }
 
-const MultiFileEditor: React.FC<MultiFileEditorProps> = ({ tree, onChange, height, theme, extensions, defaultFile }) => {
+const MultiFileEditor: React.FC<MultiFileEditorProps> = ({ tree, onChange, height, width, theme, extensions, defaultFile }) => {
   const [currentFile, setCurrentFile] = React.useState(defaultFile || Object.keys(tree).filter((key) => 'type' in tree[key] && tree[key].type === 'code')[0]);
 
   const processCodeUpdate = (value: string) => {
@@ -310,6 +311,7 @@ const MultiFileEditor: React.FC<MultiFileEditorProps> = ({ tree, onChange, heigh
     {currentFile !== undefined && <CodeMirror
     className={styles.codeView}
     height={height}
+    width={width}
     value={currentCode?.code || ''}
     theme={theme}
     extensions={currentCode?.delimiter ? [...extensions, readonlyExtensions(currentCode.templateCode!, currentCode.delimiter, currentCode.startReadonly, currentCode.invertStyling)] : extensions}

@@ -396,7 +396,7 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
           <Spring onRest={() => this.onRest(this)} config={springConfig} to={{
             turtleBearing, turtleX, turtleY
           }}>{(props: { turtleBearing: SpringValue<number>, turtleX: SpringValue<number>, turtleY: SpringValue<number> }) => (<Sprite
-            texture={PIXI.Texture.from('/turtle.svg')}
+            texture={PIXI.Texture.from('/py-notebooks/turtle.svg')}
             x={props.turtleX.to((x) => x * actualWidth / areaWidth)}
             y={props.turtleY.to((y) => y * actualHeight / areaHeight)}
             rotation={props.turtleBearing.to(deg => -deg2rad(deg - 90))}

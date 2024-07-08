@@ -190,7 +190,7 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
         <>
         <div className={cn(styles.content, styles.grow)}>
           <StyledMarkdown content={markdown_text} />
-          {nextLink && <Link to={nextLink}><div className={styles.nextLink}>
+          {nextLink && <Link to={nextLink} reloadDocument><div className={styles.nextLink}>
             Next
           </div></Link>}
         </div>
@@ -272,13 +272,14 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
         {
           codeH - constants.CODE_VERTICAL_PADDING > 10 &&
           <div
-            className={cn('code', styles.shrink)}
+            className={cn(styles.code, styles.shrink)}
             style={{height: codeH - constants.CODE_VERTICAL_PADDING}}
           >
             {actualStderr /* TODO: Make an actual stderr location (debugger?) */}
             <MultiFileEditor
               tree={codeValue}
               height={`${codeH - constants.CODE_VERTICAL_PADDING}px`}
+              width={`${window.innerWidth - contentW - 130}px`}
               theme={okaidia}
               extensions={extensions}
               onChange={setCode}
