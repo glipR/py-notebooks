@@ -29,6 +29,7 @@ const root = createRoot(container);
 let ref1 = createRef<GridSquares>();
 let ref2 = createRef<Turtles>();
 let ref3 = createRef<Terminals>();
+let ref4 = createRef<GridSquares>();
 const router = createBrowserRouter([
   {
     path: "/",
@@ -65,6 +66,14 @@ const router = createBrowserRouter([
     <ProblemDetail markdown_text={markdowns.WELCOME_MARKDOWN} template_code={templates.TERMINAL_CODE} game_ref={ref3} startScript='code.py'>
       <Terminals ref={ref3} />
     </ProblemDetail>
+    )
+  },
+  {
+    path: "/notebooks/sandpiles-demo",
+    element: (
+      <ProblemDetail markdown_text={markdowns.SANDPILES_MARKDOWN} template_code={templates.SANDPILES_CODE} game_ref={ref4} startScript='code.py'>
+        <GridSquares gridWidth={25} gridHeight={25} ref={ref4}  />
+      </ProblemDetail>
     )
   },
   {

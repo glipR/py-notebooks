@@ -13,6 +13,13 @@ from utils.mocking import send_message
 
 def send_cube(x, y, color):
     send_message(type="cube", x=x, y=y, color=color)
+
+def send_multiple(updates):
+    for update in updates:
+        assert type(update.get("x")) == int
+        assert type(update.get("y")) == int
+        assert type(update.get("color")) == int
+    send_message(type="cube_multiple", updates=updates)
 `
 
 const toHex = (color: string) =>
@@ -27,7 +34,7 @@ const toHex = (color: string) =>
 
 const config = {
   stage: {antialias: true, background: 0x2D3032},
-  spring: {duration: 300, delay: 0, precision: 0.01, ease: (t: number) => t * t * t * t * t},
+  spring: {duration: 150, delay: 0, precision: 0.01, ease: (t: number) => t * t * t * t * t},
 }
 
 interface GridSquareState {
@@ -65,6 +72,13 @@ export default class GridSquares extends React.Component<GridSquareProps, GridSq
       newGrid[obj.y][obj.x] = `#${obj.color.toString(16).padStart(6, '0')}`;
       this.setState({ colors: newGrid});
     }
+    if (obj.type === 'cube_multiple') {
+      const newGrid = [...colors];
+      for (const update of obj.updates) {
+        newGrid[update.y][update.x] = `#${update.color.toString(16).padStart(6, '0')}`;
+      }
+      this.setState({ colors: newGrid});
+    }
   }
 
   setDimensions(width: number, height: number):void {
@@ -78,6 +92,7 @@ export default class GridSquares extends React.Component<GridSquareProps, GridSq
   }
 
   render() {
+    const { gridWidth, gridHeight } = this.props;
     const { colors, width, height } = this.state;
     return (
       <Stage options={config.stage} height={height} width={width}>
@@ -86,11 +101,11 @@ export default class GridSquares extends React.Component<GridSquareProps, GridSq
           }}>{(props: { tint: SpringValue<string> }) => (<><Sprite
             key={`${x}-${y}`}
             texture={PIXI.Texture.WHITE}
-            x={x * width/10.0}
-            y={y * height/3.0}
+            x={x * width/gridWidth}
+            y={y * height/gridHeight}
             anchor={{ x: 0, y: 0 }}
-            width={width/10.0}
-            height={height/3.0}
+            width={width/gridWidth}
+            height={height/gridHeight}
             tint={props.tint.to((color) => toHex(color))}
           /></>)}</Spring>))}
         </Stage>

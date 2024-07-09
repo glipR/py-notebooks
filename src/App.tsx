@@ -8,6 +8,7 @@ function App() {
         <li><Link to='/notebooks/1'>Cubes Notebook</Link></li>
         <li><Link to='/notebooks/2'>Turtle Notebook</Link></li>
         <li><Link to='/notebooks/3'>Terminal Notebook</Link></li>
+        <li><Link to='/notebooks/sandpiles-demo'>Sandpiles Demo</Link></li>
       </ul>
 
       <h2>Intro</h2>

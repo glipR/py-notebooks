@@ -56,3 +56,59 @@ print(f"Hello {name}")
 `, '|', true, true),
   }
 }
+
+export const SANDPILES_CODE = {
+  "code.py": makeCode(`\
+from cube import send_multiple
+colours = [
+  0x222222,
+  0xaa7711,
+  0x994444,
+  0xccbb88,
+  0xeeeeee
+]
+
+grid_size = 25
+grid = [
+  [0 for _ in range(grid_size)]
+  for _ in range(grid_size)
+]
+grid[grid_size//2][grid_size//2] = 2000
+
+import time
+finished = False
+iter = 0
+while not finished:
+    finished = True
+    new_grid = [
+      [0 for _ in range(grid_size)]
+      for _ in range(grid_size)
+    ]
+    for x in range(grid_size):
+      for y in range(grid_size):
+        if grid[x][y] >= 4:
+          finished = False
+          new_grid[x][y] += grid[x][y] - 4
+          if x > 0:
+            new_grid[x-1][y] += 1
+          if x < grid_size - 1:
+            new_grid[x+1][y] += 1
+          if y > 0:
+            new_grid[x][y-1] += 1
+          if y < grid_size - 1:
+            new_grid[x][y+1] += 1
+        else:
+          new_grid[x][y] += grid[x][y]
+    grid = new_grid
+
+    if iter % 10 == 0:
+      send_multiple([
+        { "x": x, "y": y, "color": colours[min(grid[x][y], len(colours)-1)] }
+        for y in range(grid_size)
+        for x in range(grid_size)
+      ])
+      time.sleep(0.25)
+
+    iter += 1
+`)
+}

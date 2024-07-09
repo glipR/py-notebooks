@@ -49,3 +49,7 @@ forward(30)
 shift_left(10)
 ~~~
 `;
+
+export const SANDPILES_MARKDOWN = `\
+# Sandpiles
+`
