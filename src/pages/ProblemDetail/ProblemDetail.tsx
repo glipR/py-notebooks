@@ -75,7 +75,7 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
   }, [])
 
   const [codeValue, setCode] = React.useState(template_code);
-  const {runPython, stdout, stderr, isLoading, isRunning, watchModules, writeFile, sendInput, mkdir, isAwaitingInput} = usePython({
+  const {runPython, stdout, stderr, isLoading, isRunning, watchModules, writeFile, sendInput, mkdir, isAwaitingInput, interruptExecution} = usePython({
     packages: {
       micropip: ['pyodide-http']
     },
@@ -183,7 +183,7 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
         <button className={styles.top_bar_item}>Window</button>
         <div className={styles.top_bar_spacer}></div>
         <button disabled={isRunning || isLoading} onClick={playPressed} className={cn(styles.top_bar_item, styles.top_bar_small)}>{'|>'}</button>
-        <button disabled={!isRunning} className={cn(styles.top_bar_item, styles.top_bar_small)}>{'||'}</button>
+        <button disabled={!isRunning} onClick={() => {interruptExecution(); setWrittenFiles({});}} className={cn(styles.top_bar_item, styles.top_bar_small)}>{'||'}</button>
       </div>
       <div className={cn(styles.shrink, styles.contentContainer)} style={{width: contentW - constants.CONTENT_HORIZONTAL_PADDING}}>
       {contentW - constants.CONTENT_HORIZONTAL_PADDING > 10 &&
@@ -310,7 +310,11 @@ const ProblemDetail: React.FC<Props> = ({ markdown_text, template_code, children
             {stdout}
             </code>
           </div>}
-          {game_ref.current?.resetWindow && <button className={styles.resetButton} onClick={() => game_ref.current?.resetWindow?.(game_ref.current)}>R</button>}
+          {game_ref.current?.resetWindow && <button className={styles.resetButton} onClick={() => {
+            interruptExecution();
+            setWrittenFiles({});
+            game_ref.current?.resetWindow?.(game_ref.current)
+          }}>R</button>}
         </div>
       </div>
     </div>
