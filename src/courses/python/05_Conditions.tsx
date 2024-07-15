@@ -424,7 +424,8 @@ export const cond4 = (
   markdown_text={cond4MD}
   template_code={cond4Code}
   game_ref={cond4Ref}
-  startScript='code.py'>
+  startScript='code.py'
+  nextLink="/notebooks/loops/1">
   <Turtles areaHeight={100} areaWidth={200} ref={cond4Ref}
     splotches={(state: any) => [
       {x: 32.5, width: 5, y: 62.5, height: 5, color: "#ff0000"},

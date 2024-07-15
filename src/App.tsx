@@ -42,6 +42,11 @@ function App() {
         <li><Link to='/notebooks/conditions/3'>Conditions 3 - Extra If Tools</Link></li>
         <li><Link to='/notebooks/conditions/4'>Conditions 4 - Challenge - Keys</Link></li>
       </ul>
+      <h2>Loops</h2>
+      <ul>
+        <li><Link to='/notebooks/loops/1'>Loops 1 - Intro</Link></li>
+        <li><Link to='/notebooks/loops/2'>Loops 2 - Nesting and Turtle Drawing</Link></li>
+      </ul>
     </div>
   );
 }
