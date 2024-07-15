@@ -1,6 +1,6 @@
-import { Spring, SpringValue } from 'react-spring';
+import { Spring, SpringValue, to } from 'react-spring';
 import { Stage } from '@pixi/react'
-import { Sprite } from '@pixi/react-animated';
+import { Sprite, Graphics } from '@pixi/react-animated';
 import * as PIXI from 'pixi.js'
 
 import React from 'react';
@@ -47,6 +47,14 @@ def shift_up(dist):
 
 def shift_down(dist):
     shift_move(270, dist)
+
+def pen_down(color=None):
+    send_message(type="pen", down=True, color=color)
+    wait_for_message("pen_complete")
+
+def pen_up():
+    send_message(type="pen", down=False)
+    wait_for_message("pen_complete")
 `
 
 const sense_code = `\
@@ -62,11 +70,11 @@ def read_color():
         return "black"
     elif max(cols) - min(cols) < 20 and min(cols) > 200:
         return "white"
-    elif cols[0] > max(cols[1:]) + 50:
+    elif cols[0] > max(cols[1:]) + 35:
         return "red"
-    elif cols[1] > max(cols[::2]) + 50:
+    elif cols[1] > max(cols[::2]) + 35:
         return "green"
-    elif cols[2] > max(cols[:2]) + 50:
+    elif cols[2] > max(cols[:2]) + 35:
         return "blue"
     return "unknown"
 
@@ -92,6 +100,9 @@ interface TurtleState {
   height: number;
   springConfig: any;
   sendInput?: (x: string) => void;
+  penDown: boolean;
+  penColor?: number;
+  penLines: PenLine[];
   customState?: any;
 
   computedSplotches: ColorSplotch[];
@@ -105,6 +116,14 @@ interface BoundingRect {
   width: number;
   height: number;
 }
+
+interface PenLine {
+  sx: number;
+  sy: number;
+  ex: number;
+  ey: number;
+  color: number;
+};
 
 interface ColorSplotch extends BoundingRect {
   color: string;
@@ -133,11 +152,23 @@ interface TurtleProps {
   buttons?: Button[] | ((state: any) => Button[]);
   beginTransform?: Transform | ((state: any) => Transform);
   initialCustomState?: any;
+  turtleSpeedMultiplier?: number;
 }
 
 const hex2rgb = (hex: string) => {
   const bigint = parseInt(hex.slice(1), 16);
   return [bigint >> 16, (bigint >> 8) & 255, bigint & 255];
+}
+
+const drawLine = (actualWidth: number, actualHeight: number, areaWidth: number, areaHeight: number) => (sx: number, sy: number, ex: number, ey: number, color: number) => (g: PIXI.Graphics) => {
+  console.log(ey)
+  g.clear();
+  g.lineStyle({
+    width: 3,
+    color: color,
+  })
+  g.moveTo(sx * actualWidth / areaWidth, sy * actualHeight / areaHeight);
+  g.lineTo(ex * actualWidth / areaWidth, ey * actualHeight / areaHeight);
 }
 
 export default class Turtles extends React.Component<TurtleProps, TurtleState> {
@@ -155,6 +186,9 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
       turtleY: transform?.y ?? props.areaHeight / 2,
       width: 10,
       height: 10,
+      penDown: false,
+      penColor: 0xaaaaaa,
+      penLines: [],
       springConfig: {...config.spring},
       customState,
       computedSplotches,
@@ -173,6 +207,7 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
       turtleX: transform?.x ?? areaWidth / 2,
       turtleY: transform?.y ?? areaHeight / 2,
       customState,
+      penLines: [],
     }))
   }
 
@@ -256,7 +291,8 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
   }
 
   tryMoveTurtle(dist: number, bearing: number) {
-    const { turtleX, turtleY, computedButtons, computedWalls } = this.state;
+    const { turtleSpeedMultiplier } = this.props;
+    const { turtleX, turtleY, computedButtons, computedWalls, penDown, penColor } = this.state;
     const newX = turtleX + dist * Math.cos(deg2rad(bearing));
     const newY = turtleY - dist * Math.sin(deg2rad(bearing));
     const { x, y } = this.findObstruction(turtleX, turtleY, bearing, computedWalls);
@@ -276,19 +312,56 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
               customState
             }
           })
-        }, buttonDist / MOVEMENT_SPEED)
+        }, buttonDist / MOVEMENT_SPEED / (turtleSpeedMultiplier ?? 1))
       }
     }
+    let actualDist = 0;
+    let actualX = 0;
+    let actualY = 0;
     if (moveDist > wallDist) {
-      this.setDuration(wallDist / MOVEMENT_SPEED);
-      this.setState({ turtleX: x, turtleY: y });
+      actualDist = wallDist;
+      actualX = x;
+      actualY = y;
     } else {
-      this.setDuration(moveDist / MOVEMENT_SPEED);
-      this.setState({ turtleX: newX, turtleY: newY });
+      actualDist = moveDist;
+      actualX = newX;
+      actualY = newY;
+    }
+    this.setDuration(actualDist / MOVEMENT_SPEED / (turtleSpeedMultiplier ?? 1));
+    this.setState({ turtleX: actualX, turtleY: actualY });
+
+    if (penDown) {
+      this.setState((s) => ({
+        ...s,
+        penLines: [
+          ...s.penLines,
+          {
+            sx: turtleX,
+            sy: turtleY,
+            ex: turtleX,
+            ey: turtleY,
+            color: penColor ?? 0
+          }
+        ]
+      }))
+      const self = this;
+      setTimeout(() => {
+        self.setState((s) => {
+          const penLines = [...s.penLines];
+          console.log("set");
+          penLines[penLines.length-1].ex = actualX;
+          penLines[penLines.length-1].ey = actualY;
+          return {
+            ...s,
+            penLines,
+          }
+        })
+      }, 10)
     }
   }
 
   ingestMessage(obj: any, sendInput: (x: string) => void):void {
+    const { turtleSpeedMultiplier } = this.props;
     const { turtleBearing } = this.state;
     if (obj.type === 'forward') {
       const dist = obj.dist;
@@ -298,14 +371,14 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
       this.tryMoveTurtle(dist, 180 + turtleBearing);
     } else if (obj.type === "right") {
       const angle = obj.angle;
-      this.setDuration(Math.abs(angle) / ROTATION_SPEED);
+      this.setDuration(Math.abs(angle) / ROTATION_SPEED / (turtleSpeedMultiplier ?? 1));
       this.setState({
         turtleBearing: turtleBearing - angle,
       });
     }
     else if (obj.type === "left") {
       const angle = obj.angle;
-      this.setDuration(Math.abs(angle) / ROTATION_SPEED);
+      this.setDuration(Math.abs(angle) / ROTATION_SPEED / (turtleSpeedMultiplier ?? 1));
       this.setState({
         turtleBearing: turtleBearing + angle,
       });
@@ -332,6 +405,13 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
     else if (obj.type === "distance_sense") {
       const dist = this.wallDist();
       sendInput?.(JSON.stringify({type: "distance_read", distance: dist}));
+    }
+    else if (obj.type === "pen") {
+      this.setState({ penDown: obj.down});
+      if (!!obj.color) {
+        this.setState({ penColor: obj.color });
+      }
+      sendInput?.(JSON.stringify({type: "pen_complete"}))
     }
     this.setState({ sendInput });
   }
@@ -364,7 +444,7 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
   }
 
   render() {
-    const { width, height, turtleBearing, turtleX, turtleY, springConfig, computedSplotches, computedWalls } = this.state;
+    const { width, height, turtleBearing, turtleX, turtleY, springConfig, computedSplotches, computedWalls, penLines } = this.state;
     const { areaWidth, areaHeight } = this.props;
     const actualHeight = Math.min(height, width / PREFERRED_SCALE);
     const actualWidth = Math.min(width, height * PREFERRED_SCALE);
@@ -392,6 +472,18 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
               height={wall.height * actualHeight / areaHeight}
               tint={wall.color}
             />
+          ))}
+          {penLines.map((line, i) => (
+            <Spring key={i} config={springConfig} to={{
+              sx: line.sx,
+              sy: line.sy,
+              ex: line.ex,
+              ey: line.ey,
+              color: line.color,
+            }}>{(props: {sx: SpringValue<number>, sy: SpringValue<number>, ex: SpringValue<number>, ey: SpringValue<number>, color: SpringValue<number>}) => (<Graphics
+              draw={to([props.sx, props.sy, props.ex, props.ey, props.color], drawLine(actualWidth, actualHeight, areaWidth, areaHeight)) as any}
+            ></Graphics>)}
+            </Spring>
           ))}
           <Spring onRest={() => this.onRest(this)} config={springConfig} to={{
             turtleBearing, turtleX, turtleY
