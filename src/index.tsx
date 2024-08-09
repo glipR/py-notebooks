@@ -7,7 +7,7 @@ import reportWebVitals from './reportWebVitals';
 import './index.css';
 
 import {
-  createHashRouter,
+  createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
 import GridSquares from './games/GridSquares/GridSquares';
@@ -31,7 +31,7 @@ let ref1 = createRef<GridSquares>();
 let ref2 = createRef<Turtles>();
 let ref3 = createRef<Terminals>();
 let ref4 = createRef<GridSquares>();
-const router = createHashRouter([
+const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
