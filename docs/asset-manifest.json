@@ -1,0 +1,20 @@
+{
+  "files": {
+    "main.css": "/py-notebooks/static/css/main.d429730f.css",
+    "main.js": "/py-notebooks/static/js/main.9f06c6fa.js",
+    "static/js/453.4aad7ee4.chunk.js": "/py-notebooks/static/js/453.4aad7ee4.chunk.js",
+    "static/js/114.665b9695.chunk.js": "/py-notebooks/static/js/114.665b9695.chunk.js",
+    "static/js/376.5fe3699b.chunk.js": "/py-notebooks/static/js/376.5fe3699b.chunk.js",
+    "static/media/service-worker.js": "/py-notebooks/static/media/service-worker.eb2afcb0f644e1c80257.js",
+    "index.html": "/py-notebooks/index.html",
+    "main.d429730f.css.map": "/py-notebooks/static/css/main.d429730f.css.map",
+    "main.9f06c6fa.js.map": "/py-notebooks/static/js/main.9f06c6fa.js.map",
+    "453.4aad7ee4.chunk.js.map": "/py-notebooks/static/js/453.4aad7ee4.chunk.js.map",
+    "114.665b9695.chunk.js.map": "/py-notebooks/static/js/114.665b9695.chunk.js.map",
+    "376.5fe3699b.chunk.js.map": "/py-notebooks/static/js/376.5fe3699b.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.d429730f.css",
+    "static/js/main.9f06c6fa.js"
+  ]
+}
