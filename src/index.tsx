@@ -7,7 +7,7 @@ import reportWebVitals from './reportWebVitals';
 import './index.css';
 
 import {
-  createBrowserRouter,
+  createHashRouter,
   RouterProvider,
 } from "react-router-dom";
 import GridSquares from './games/GridSquares/GridSquares';
@@ -31,7 +31,7 @@ let ref1 = createRef<GridSquares>();
 let ref2 = createRef<Turtles>();
 let ref3 = createRef<Terminals>();
 let ref4 = createRef<GridSquares>();
-const router = createBrowserRouter([
+const router = createHashRouter([
   {
     path: "/",
     element: <App />,
@@ -149,7 +149,7 @@ const router = createBrowserRouter([
     path: "/notebooks/loops/2",
     element: loop2,
   },
-], {basename: '/py-notebooks'});
+]);
 
 root.render(
   <React.StrictMode>
