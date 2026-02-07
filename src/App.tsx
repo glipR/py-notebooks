@@ -45,7 +45,8 @@ function App() {
       <h2>Loops</h2>
       <ul>
         <li><Link to='/notebooks/loops/1'>Loops 1 - Intro</Link></li>
-        <li><Link to='/notebooks/loops/2'>Loops 2 - Nesting and Turtle Drawing</Link></li>
+        <li><Link to='/notebooks/loops/2'>Loops 2 - Challenge #1</Link></li>
+        <li><Link to='/notebooks/loops/3'>Loops 3 - Loops on Loops</Link></li>
       </ul>
     </div>
   );

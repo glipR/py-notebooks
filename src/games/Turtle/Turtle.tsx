@@ -208,6 +208,7 @@ export default class Turtles extends React.Component<TurtleProps, TurtleState> {
       turtleY: transform?.y ?? areaHeight / 2,
       customState,
       penLines: [],
+      penDown: false,
     }))
   }
 

@@ -22,7 +22,7 @@ import { strings1, strings2 } from './courses/python/02_Strings';
 import { variables1, variables2, variables3, variables4, variables5 } from './courses/python/03_Variables';
 import { functions1, functions2 } from './courses/python/04_Calling_Methods';
 import { cond1, cond2, cond3, cond4 } from './courses/python/05_Conditions';
-import { loop1, loop2 } from './courses/python/06_Loops';
+import { loop1, loop2, loop3 } from './courses/python/06_Loops';
 
 const container = document.getElementById('root')!;
 const root = createRoot(container);
@@ -149,7 +149,11 @@ const router = createHashRouter([
     path: "/notebooks/loops/2",
     element: loop2,
   },
-]);
+  {
+    path: "/notebooks/loops/3",
+    element: loop3,
+  },
+], {basename: '/py-notebooks'});
 
 root.render(
   <React.StrictMode>

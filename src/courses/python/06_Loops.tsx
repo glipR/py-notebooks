@@ -119,11 +119,9 @@ export const loop1 = (
 </ProblemDetail> );
 
 const loop2MD = `\
-## Looping and Looping
+## Challenge 1
 
-Let's get some more practice in and also get used to nested loops - a \`while\` loop which we run multiple times because it's indented in another \`while\` loop.
-
-We can use this new tooling to draw some pretty pictures with our turtle, using the new \`pen_down\` and \`pen_up\` functions!
+Let's get some more practice in and also use this new tooling to draw some pretty pictures with our turtle, using the new \`pen_down\` and \`pen_up\` functions!
 
 * \`pen_down\` - all future turtle movement will leave a trail. This function takes 0 *or* 1 arguments.
   * If no arguments are given, the default (or previous) color is used for the trail
@@ -132,6 +130,7 @@ We can use this new tooling to draw some pretty pictures with our turtle, using 
 
 Edit the sections of the code so the following picture is printed:
 
+**TODO**
 `;
 const loop2Code = {
   "code.py": makeCode(`\
@@ -171,4 +170,72 @@ export const loop2 = (
   startScript='code.py'
   nextLink="/notebooks/loops/3">
   <Turtles turtleSpeedMultiplier={3} beginTransform={{x: 10, y: 10, bearing: -90}} areaHeight={100} areaWidth={200} ref={loop2Ref} />
+</ProblemDetail> );
+
+
+const loop3MD = `\
+## Loops on Loops
+
+While you might've used this in the bonus challenge before, you can also nest loops - a \`while\` loop which we run multiple times because it's indented in another \`while\` loop.
+
+This allows us to repeat something over multiple conditions, for example:
+
+* While there are unpicked trees in the orchard
+* While the tree you are looking at is unpicked
+* Pick an apple
+
+In our turtle case, we want to use this to cover the screen with squares. Provided is some code that will automatically draw a square of a random size in a random colour. Don't worry too much about the details for now.
+
+Write some code that will draw these squares 20 units apart until the entire screen is covered.
+
+:::note{.hint}
+You'll need two while loops here. One way to solve this is having one while loop draw all of the squares in a single row, and then have an additional while loop handle vertical movement (and moving back to the left)
+:::
+`;
+const loop3Code = {
+  "code.py": makeCode(`\
+from turtle.movement import *
+from random import randint
+
+# Draws a square and moves back to the original position.
+size = randint(5, 15)
+hue = randint(0, 359)
+red, green, blue = 0, 0, 0
+if hue < 120:
+    red = int((120-hue) * 255 / 120)
+    green = int((hue) * 255 / 120)
+elif hue < 240:
+    green = int((240-hue) * 255 / 120)
+    blue = int((hue - 120) * 255 / 120)
+else:
+    blue = int((360 - hue) * 255 / 120)
+    red = int((hue - 240) * 255 / 120)
+color = 255 * 255 * red + 255 * green + blue
+forward(size/2)
+pen_down(color)
+right(90)
+forward(size/2)
+right(90)
+forward(size)
+right(90)
+forward(size)
+right(90)
+forward(size)
+right(90)
+forward(size/2)
+left(90)
+pen_up()
+backward(size/2)
+
+`,)
+}
+const loop3Ref = createRef<Turtles>();
+export const loop3 = (
+<ProblemDetail
+  markdown_text={loop3MD}
+  template_code={loop3Code}
+  game_ref={loop3Ref}
+  startScript='code.py'
+  nextLink="/notebooks/loops/4">
+  <Turtles turtleSpeedMultiplier={10} beginTransform={{x: 20, y: 20, bearing: -90}} areaHeight={100} areaWidth={200} ref={loop3Ref} />
 </ProblemDetail> );
